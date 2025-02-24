@@ -1,12 +1,27 @@
 "use client"
 import { useState } from "react"
+import type React from "react"
+
+import { useRouter } from "next/navigation"
 import Link from "next/link"
 import GlassmorphismCard from "../components/glassmorphism-card"
 
 export default function Login() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
- 
+  const router = useRouter()
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+
+    // Credenciais do administrador
+    if (email === "admin@saashealer.com" && password === "admin123") {
+      router.push("/admin/dashboard")
+    } else {
+      // Aqui você pode adicionar lógica para login de usuários normais
+      alert("Credenciais inválidas")
+    }
+  }
 
   return (
     <main className="min-h-screen pt-24 pb-16 flex items-center justify-center">
@@ -18,7 +33,7 @@ export default function Login() {
               <p className="text-white/80">Bem-vindo de volta!</p>
             </div>
 
-            <form className="space-y-4">
+            <form className="space-y-4" onSubmit={handleSubmit}>
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-white mb-1">
                   Email
@@ -56,6 +71,16 @@ export default function Login() {
                 Entrar
               </button>
             </form>
+
+            <div className="mt-4 text-center">
+              <p className="text-white/80 text-sm">
+                Credenciais de Admin (para teste):
+                <br />
+                Email: admin@saashealer.com
+                <br />
+                Senha: admin123
+              </p>
+            </div>
 
             <p className="mt-6 text-center text-white/80">
               Não tem uma conta?{" "}
