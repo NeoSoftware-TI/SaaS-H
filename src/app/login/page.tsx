@@ -7,7 +7,7 @@ import GlassmorphismCard from "../components/glassmorphism-card"
 export default function Login() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const router = useRouter()
+ 
 
   return (
     <main className="min-h-screen pt-24 pb-16 flex items-center justify-center">
