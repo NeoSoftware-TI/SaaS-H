@@ -1,36 +1,42 @@
-/*
-import type React from "react"
+import GlassmorphismCard from "./glassmorphism-card"
+import { MonitorSmartphone, Shield, Clock } from "lucide-react"
 
-interface GlassmorphismCardProps {
-  children: React.ReactNode
-}
+const features = [
+  {
+    title: "Acesso Multiplataforma",
+    description: "Acesse seu painel médico de qualquer dispositivo, em qualquer lugar",
+    icon: MonitorSmartphone,
+  },
+  {
+    title: "Seguro & Privado",
+    description: "Seus dados são protegidos com segurança de nível empresarial",
+    icon: Shield,
+  },
+  {
+    title: "Disponível 24/7",
+    description: "Acesso aos serviços de saúde 24 horas por dia",
+    icon: Clock,
+  },
+]
 
-const GlassmorphismCard: React.FC<GlassmorphismCardProps> = ({ children }) => {
+export default function Features() {
   return (
-    <div className="p-8 h-screen w-full bg-gradient-to-br from-purple-400 via-pink-500 to-red-500 flex items-center justify-center">
-      <div className="backdrop-blur-md bg-white bg-opacity-10 rounded-3xl p-8 shadow-lg border border-white border-opacity-20 max-w-md w-full">
-        {children}
+    <section className="w-full py-24">
+      <div className="container mx-auto px-6">
+        <h2 className="text-4xl font-bold text-white text-center mb-16">Nossos Recursos</h2>
+        <div className="grid md:grid-cols-3 gap-8">
+          {features.map((feature, index) => (
+            <GlassmorphismCard key={index}>
+              <div className="text-white">
+                <feature.icon className="w-12 h-12 mb-6" />
+                <h3 className="text-xl font-semibold mb-4">{feature.title}</h3>
+                <p className="text-white/80">{feature.description}</p>
+              </div>
+            </GlassmorphismCard>
+          ))}
+        </div>
       </div>
-    </div>
+    </section>
   )
 }
-
-export default GlassmorphismCard
-import GlassmorphismCard from "../components/glassmorphism-card"
-
-export default function Home() {
-  return (
-    <GlassmorphismCard>
-      <h1 className="text-3xl font-bold mb-4 text-white">Glassmorphism Card</h1>
-      <p className="text-white text-opacity-80">
-        This is a translucent, frosted glass effect card created using Next.js and Tailwind CSS. The backdrop-filter
-        property is used to create the frosted glass look.
-      </p>
-    </GlassmorphismCard>
-  )
-}
-*/
-
-
-
 
