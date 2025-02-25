@@ -8,7 +8,7 @@ export default function Hero() {
         <p className="text-xl text-white/80 mb-12 max-w-2xl mx-auto">Sua solução completa para gestão de saúde</p>
         <Link
           href="/cadastro"
-          className="inline-block bg-white text-purple-600 px-8 py-3 rounded-lg font-semibold hover:bg-white/90 transition-colors"
+          className="inline-block bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-white/90 transition-colors"
         >
           Começar Agora
         </Link>

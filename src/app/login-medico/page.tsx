@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import GlassmorphismCard from "../components/glassmorphism-card"
 
-export default function Login() {
+export default function LoginMedico() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const router = useRouter()
@@ -15,7 +15,7 @@ export default function Login() {
     e.preventDefault()
     // Simulação de login - em produção, você faria uma chamada à API
     if (email && password) {
-      router.push("/agendamento")
+      router.push("/medico/dashboard")
     }
   }
 
@@ -25,8 +25,8 @@ export default function Login() {
         <div className="max-w-md mx-auto">
           <GlassmorphismCard>
             <div className="text-center mb-8">
-              <h1 className="text-2xl font-bold text-white mb-2">Login</h1>
-              <p className="text-white/80">Bem-vindo de volta!</p>
+              <h1 className="text-2xl font-bold text-white mb-2">Login do Médico</h1>
+              <p className="text-white/80">Acesse sua área de gerenciamento</p>
             </div>
 
             <form className="space-y-4" onSubmit={handleSubmit}>
@@ -69,28 +69,11 @@ export default function Login() {
             </form>
 
             <p className="mt-6 text-center text-white/80">
-              Não tem uma conta?{" "}
-              <Link href="/cadastro" className="text-white hover:text-white/90 underline">
-                Cadastre-se
+              <Link href="/login" className="text-white hover:text-white/90 underline">
+                Voltar para login de usuário
               </Link>
             </p>
           </GlassmorphismCard>
-        </div>
-
-        {/* Links de acesso rápido para teste */}
-        <div className="fixed bottom-4 right-4 backdrop-blur-md bg-white/10 rounded-lg border border-white/20 p-3">
-          <p className="text-white/80 text-xs mb-2">Acessos para teste:</p>
-          <div className="flex flex-col gap-1">
-            <Link href="/agendamento" className="text-white/90 hover:text-white text-sm transition-colors">
-              Usuário
-            </Link>
-            <Link href="/medico/dashboard" className="text-white/90 hover:text-white text-sm transition-colors">
-              Médico
-            </Link>
-            <Link href="/admin/dashboard" className="text-white/90 hover:text-white text-sm transition-colors">
-              Admin
-            </Link>
-          </div>
         </div>
       </div>
     </main>
