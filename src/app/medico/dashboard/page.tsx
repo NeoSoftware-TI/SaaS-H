@@ -13,7 +13,7 @@ interface Appointment {
 }
 
 export default function MedicoDashboard() {
-  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [appointments] = useState<Appointment[]>([]);
   const [showChat, setShowChat] = useState(false);
 
   return (
@@ -64,4 +64,3 @@ export default function MedicoDashboard() {
     </div>
   )
 }
-
