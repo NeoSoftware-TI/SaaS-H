@@ -1,52 +1,85 @@
-"use client"
+"use client";
 
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react";
 
-interface Message {
-  id: number
-  sender: string
-  text: string
+interface ChatProps {
+  usuario: "medico" | "admin";
 }
 
-export default function Chat() {
-  const [messages, setMessages] = useState<Message[]>([{ id: 1, sender: "Sistema", text: "Bem-vindo ao chat!" }])
-  const [newMessage, setNewMessage] = useState("")
+interface Mensagem {
+  remetente: "medico" | "admin";
+  texto: string;
+}
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (newMessage.trim()) {
-      setMessages([...messages, { id: messages.length + 1, sender: "Você", text: newMessage }])
-      setNewMessage("")
+export default function Chat({ usuario }: ChatProps) {  // Adicionando a tipagem correta
+  const [mensagem, setMensagem] = useState("");
+  const [mensagens, setMensagens] = useState<Mensagem[]>([]);
+  const chatEndRef = useRef<HTMLDivElement>(null);
+
+  // Simula recebimento de mensagem do outro usuário após 2s
+  useEffect(() => {
+    const receberMensagem = () => {
+      if (mensagens.length > 0) {
+        setTimeout(() => {
+          setMensagens((prev) => [
+            ...prev,
+            { remetente: usuario === "medico" ? "admin" : "medico", texto: "Mensagem automática de resposta" },
+          ]);
+        }, 2000);
+      }
+    };
+    receberMensagem();
+  }, [mensagens, usuario]);
+
+  // Rola automaticamente para a última mensagem
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [mensagens]);
+
+  const enviarMensagem = () => {
+    if (mensagem.trim() !== "") {
+      setMensagens([...mensagens, { remetente: usuario, texto: mensagem }]);
+      setMensagem("");
     }
-  }
+  };
 
   return (
-    <div className="max-w-md mx-auto">
-      <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
-        <div className="mb-4 h-64 overflow-y-auto">
-          {messages.map((message) => (
-            <div key={message.id} className="mb-2">
-              <strong>{message.sender}:</strong> {message.text}
+    <div className="bg-white border rounded-lg shadow-lg w-80 p-4 flex flex-col">
+      {/* Área de mensagens */}
+      <div className="h-48 overflow-y-auto border-b mb-2 p-2 bg-gray-100 rounded">
+        {mensagens.length > 0 ? (
+          mensagens.map((msg, index) => (
+            <div
+              key={index}
+              className={`p-2 rounded break-words max-w-full ${
+                msg.remetente === usuario ? "bg-blue-500 text-white self-end" : "bg-gray-300 text-black self-start"
+              }`}
+            >
+              {msg.texto}
             </div>
-          ))}
-        </div>
-        <form onSubmit={handleSubmit}>
-          <input
-            type="text"
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            placeholder="Digite sua mensagem..."
-          />
-          <button
-            type="submit"
-            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-2"
-          >
-            Enviar
-          </button>
-        </form>
+          ))
+        ) : (
+          <p className="text-gray-500 text-sm">Nenhuma mensagem ainda</p>
+        )}
+        <div ref={chatEndRef} />
+      </div>
+
+      {/* Entrada de texto e botão */}
+      <div className="flex space-x-2">
+        <input
+          type="text"
+          placeholder="Digite sua mensagem..."
+          value={mensagem}
+          onChange={(e) => setMensagem(e.target.value)}
+          className="border p-2 rounded text-sm flex-1 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <button
+          className="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700"
+          onClick={enviarMensagem}
+        >
+          Enviar
+        </button>
       </div>
     </div>
-  )
+  );
 }
-

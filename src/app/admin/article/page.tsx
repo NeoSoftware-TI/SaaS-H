@@ -1,6 +1,7 @@
-"use client"
+"use client";
 
-import { useState } from "react"
+import { useState } from "react";
+import { useRouter } from "next/navigation"; // Importação do useRouter
 
 const articleTemplates = [
   {
@@ -21,19 +22,20 @@ const articleTemplates = [
     content:
       "Conheça o Dr./Dra. [Nome], especialista em [Especialidade]. Com [X] anos de experiência, [ele/ela] tem se destacado por [Realizações]. Agende sua consulta e conte com um atendimento de excelência!",
   },
-]
+];
 
 export default function ArtigosLinkedIn() {
-  const [selectedTemplate, setSelectedTemplate] = useState(articleTemplates[0])
-  const [customizedContent, setCustomizedContent] = useState(selectedTemplate.content)
+  const [selectedTemplate, setSelectedTemplate] = useState(articleTemplates[0]);
+  const [customizedContent, setCustomizedContent] = useState(selectedTemplate.content);
+  const router = useRouter(); // Hook para navegação
 
   const handleTemplateChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const template = articleTemplates.find((t) => t.id === Number.parseInt(e.target.value))
+    const template = articleTemplates.find((t) => t.id === Number.parseInt(e.target.value));
     if (template) {
-      setSelectedTemplate(template)
-      setCustomizedContent(template.content)
+      setSelectedTemplate(template);
+      setCustomizedContent(template.content);
     }
-  }
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -68,11 +70,18 @@ export default function ArtigosLinkedIn() {
       </div>
       <button
         onClick={() => alert("Artigo gerado e pronto para publicação no LinkedIn!")}
-        className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+        className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mb-4"
       >
         Gerar Artigo
       </button>
-    </div>
-  )
-}
 
+      {/* Botão para acessar o chat */}
+      <button
+        onClick={() => router.push("/admin/chat")}
+        className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+      >
+        Ir para o Chat
+      </button>
+    </div>
+  );
+}

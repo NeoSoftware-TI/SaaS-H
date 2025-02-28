@@ -1,11 +1,13 @@
-import Chat from "@/app/components/Chat"
+"use client";
+import { useRouter } from "next/navigation"; // Importação correta
 
-export default function AdminChat() {
+export default function ChatAdmin() {
+  const router = useRouter(); // Definição correta do router
+
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8 text-blue-600">Chat do Administrador</h1>
-      <Chat />
+    <div>
+      <h1>Chat do Admin</h1>
+      <button onClick={() => router.push("/admin/dashboard")}>Voltar para Dashboard</button>
     </div>
-  )
+  );
 }
-

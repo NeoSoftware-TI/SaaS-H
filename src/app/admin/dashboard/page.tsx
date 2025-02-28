@@ -1,71 +1,43 @@
 "use client";
 
-// admin.js (Página do Admin)
+import { useState } from "react";
+import Link from "next/link";
+import Chat from "@/app/components/Chat";
+import { MessageCircle } from "lucide-react";
 
-import { useState, useEffect } from 'react';
-
-interface Medico {
-  id: number;
-  nome: string;
-  especialidade: string;
-}
-
-const AdminPage = () => {
-  const [medicos, setMedicos] = useState<Medico[]>([]);
-  const [nome, setNome] = useState('');
-  const [especialidade, setEspecialidade] = useState('');
-
-  useEffect(() => {
-    const medicosArmazenados: Medico[] = JSON.parse(localStorage.getItem('medicos') || '[]');
-    setMedicos(medicosArmazenados);
-  }, []);
-
-  const adicionarMedico = () => {
-    if (!nome || !especialidade) return alert('Preencha todos os campos');
-    const novoMedico: Medico = { id: Date.now(), nome, especialidade };
-    const medicosAtualizados = [...medicos, novoMedico];
-    setMedicos(medicosAtualizados);
-    localStorage.setItem('medicos', JSON.stringify(medicosAtualizados));
-    setNome('');
-    setEspecialidade('');
-  };
-
-  const removerMedico = (id: number) => {
-    const medicosAtualizados = medicos.filter(medico => medico.id !== id);
-    setMedicos(medicosAtualizados);
-    localStorage.setItem('medicos', JSON.stringify(medicosAtualizados));
-  };
+export default function AdminDashboard() {
+  const [showChat, setShowChat] = useState(false);
 
   return (
-    <div className="p-6 max-w-2xl mx-auto mt-10">
-      <h1 className="text-2xl font-bold mb-4">Gerenciar Médicos</h1>
-      <div className="mb-4">
-        <input
-          type="text"
-          placeholder="Nome"
-          value={nome}
-          onChange={(e) => setNome(e.target.value)}
-          className="border p-2 mr-2"
-        />
-        <input
-          type="text"
-          placeholder="Especialidade"
-          value={especialidade}
-          onChange={(e) => setEspecialidade(e.target.value)}
-          className="border p-2 mr-2"
-        />
-        <button onClick={adicionarMedico} className="bg-blue-500 text-white p-2">Adicionar</button>
+    <div className="container mx-auto px-4 py-8 pt-16"> {/* Adicionado padding-top para evitar sobreposição do cabeçalho */}
+      <h1 className="text-3xl font-bold mb-8 text-blue-600">Dashboard do Admin</h1>
+
+      <div className="flex space-x-4">
+        <Link href="/admin/configuracoes" className="bg-blue-600 text-white px-4 py-2 rounded">
+          Configurações
+        </Link>
       </div>
-      <ul>
-        {medicos.map(medico => (
-          <li key={medico.id} className="flex justify-between items-center border-b p-2">
-            <span>{medico.nome} - {medico.especialidade}</span>
-            <button onClick={() => removerMedico(medico.id)} className="bg-red-500 text-white p-1">Remover</button>
-          </li>
-        ))}
-      </ul>
+
+      {/* Botão do Chat flutuante */}
+      <div className="fixed bottom-4 right-4">
+        <button 
+          className="bg-blue-600 text-white p-4 rounded-full shadow-lg flex items-center justify-center hover:bg-blue-700"
+          onClick={() => setShowChat(!showChat)}
+        >
+          <MessageCircle size={24} />
+        </button>
+      </div>
+
+      {/* Popup do Chat */}
+      {showChat && (
+        <div className="fixed bottom-16 right-4 bg-white border rounded-lg shadow-lg w-80 p-4">
+          <div className="flex justify-between items-center mb-2">
+            <h2 className="text-lg font-bold">Chat</h2>
+            <button className="text-red-500" onClick={() => setShowChat(false)}>X</button>
+          </div>
+          <Chat usuario="admin" />
+        </div>
+      )}
     </div>
   );
-};
-
-export default AdminPage;
+}
