@@ -1,24 +1,27 @@
-"use client"
-import { useState } from "react"
-import Link from "next/link"
-import GlassmorphismCard from "../components/glassmorphism-card"
+"use client";
+import { useState } from "react";
+import Link from "next/link";
+import GlassmorphismCard from "../components/glassmorphism-card"; //nomenclatura
 
 export default function Cadastro() {
-  const [email, setEmail] = useState("")
-  const [senha, setSenha] = useState("")
-  const [cpf, setCpf] = useState("")
-  const [dataNascimento, setDataNascimento] = useState("")
-  const [telefone, setTelefone] = useState("")
-  const [genero, setGenero] = useState("")
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
+  const [cpf, setCpf] = useState("");
+  const [dataNascimento, setDataNascimento] = useState("");
+  const [telefone, setTelefone] = useState("");
+  const [genero, setGenero] = useState("");
 
   return (
-    <main className="min-h-screen pt-24 pb-16 flex items-center justify-center">
+    <main className="min-h-screen flex items-center justify-center pt-24 pb-16">
       <div className="container mx-auto px-6">
         <div className="max-w-md mx-auto">
           <GlassmorphismCard>
-            <div className="text-center mb-8">
-              <h1 className="text-2xl font-bold text-white mb-2">Criar Conta</h1>
-              <p className="text-white/80">Comece sua jornada com o SaaSHealer</p>
+            {/* Título e descrição dentro do card */}
+            <div className="mb-8 text-center">
+              <h1 className="text-3xl font-bold text-white mb-2">Criar Conta</h1>
+              <p className="text-white/80">
+                Comece sua jornada com o SaaSHealer
+              </p>
             </div>
 
             <form className="space-y-4">
@@ -31,8 +34,8 @@ export default function Cadastro() {
                   id="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-white/30"
                   placeholder="seu@email.com"
+                  className="w-full p-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/30"
                   required
                 />
               </div>
@@ -46,8 +49,8 @@ export default function Cadastro() {
                   id="senha"
                   value={senha}
                   onChange={(e) => setSenha(e.target.value)}
-                  className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-white/30"
                   placeholder="Digite sua senha"
+                  className="w-full p-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/30"
                   required
                 />
               </div>
@@ -61,8 +64,8 @@ export default function Cadastro() {
                   id="cpf"
                   value={cpf}
                   onChange={(e) => setCpf(e.target.value)}
-                  className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-white/30"
                   placeholder="000.000.000-00"
+                  className="w-full p-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/30"
                   required
                 />
               </div>
@@ -76,7 +79,7 @@ export default function Cadastro() {
                   id="dataNascimento"
                   value={dataNascimento}
                   onChange={(e) => setDataNascimento(e.target.value)}
-                  className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-white/30"
+                  className="w-full p-3 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-white/30"
                   required
                 />
               </div>
@@ -90,8 +93,8 @@ export default function Cadastro() {
                   id="telefone"
                   value={telefone}
                   onChange={(e) => setTelefone(e.target.value)}
-                  className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-white/30"
                   placeholder="(00) 00000-0000"
+                  className="w-full p-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/30"
                   required
                 />
               </div>
@@ -104,27 +107,19 @@ export default function Cadastro() {
                   id="genero"
                   value={genero}
                   onChange={(e) => setGenero(e.target.value)}
-                  className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-white/30"
+                  className="w-full p-3 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-white/30"
                   required
                 >
-                  <option value="" className="text-blue-600">
-                    Selecione
-                  </option>
-                  <option value="masculino" className="text-blue-600">
-                    Masculino
-                  </option>
-                  <option value="feminino" className="text-blue-600">
-                    Feminino
-                  </option>
-                  <option value="outro" className="text-blue-600">
-                    Outro
-                  </option>
+                  <option value="" className="text-blue-600">Selecione</option>
+                  <option value="masculino" className="text-blue-600">Masculino</option>
+                  <option value="feminino" className="text-blue-600">Feminino</option>
+                  <option value="outro" className="text-blue-600">Outro</option>
                 </select>
               </div>
 
               <button
                 type="submit"
-                className="w-full bg-white text-blue-600 py-2 px-4 rounded-lg font-semibold hover:bg-white/90 transition-colors"
+                className="w-full py-3 bg-white text-blue-600 rounded-lg font-semibold hover:bg-white/90 transition-colors"
               >
                 Cadastrar
               </button>
@@ -140,6 +135,5 @@ export default function Cadastro() {
         </div>
       </div>
     </main>
-  )
+  );
 }
-

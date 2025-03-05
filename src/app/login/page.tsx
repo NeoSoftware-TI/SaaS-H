@@ -62,7 +62,7 @@ export default function Login() {
 
               <button
                 type="submit"
-                className="w-full bg-white text-blue-600 py-2 px-4 rounded-lg font-semibold hover:bg-white/90 transition-colors"
+                className="w-full bg-white text-blue-600 py-2 px-4 rounded-lg font-semibold hover:bg-white/90 transition-colors rounded"
               >
                 Entrar
               </button>
@@ -96,4 +96,3 @@ export default function Login() {
     </main>
   )
 }
-

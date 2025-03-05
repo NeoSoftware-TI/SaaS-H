@@ -11,24 +11,28 @@ interface Mensagem {
   texto: string;
 }
 
-export default function Chat({ usuario }: ChatProps) {  // Adicionando a tipagem correta
+export default function Chat({ usuario }: ChatProps) {
   const [mensagem, setMensagem] = useState("");
   const [mensagens, setMensagens] = useState<Mensagem[]>([]);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
-  // Simula recebimento de mensagem do outro usuário após 2s
+  // Auto-resposta: dispara somente se a última mensagem for do usuário
   useEffect(() => {
-    const receberMensagem = () => {
-      if (mensagens.length > 0) {
-        setTimeout(() => {
-          setMensagens((prev) => [
-            ...prev,
-            { remetente: usuario === "medico" ? "admin" : "medico", texto: "Mensagem automática de resposta" },
-          ]);
-        }, 2000);
-      }
-    };
-    receberMensagem();
+    if (
+      mensagens.length > 0 &&
+      mensagens[mensagens.length - 1].remetente === usuario
+    ) {
+      const timer = setTimeout(() => {
+        setMensagens((prev) => [
+          ...prev,
+          {
+            remetente: usuario === "medico" ? "admin" : "medico",
+            texto: "Mensagem automática de resposta",
+          },
+        ]);
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
   }, [mensagens, usuario]);
 
   // Rola automaticamente para a última mensagem
@@ -38,21 +42,26 @@ export default function Chat({ usuario }: ChatProps) {  // Adicionando a tipagem
 
   const enviarMensagem = () => {
     if (mensagem.trim() !== "") {
-      setMensagens([...mensagens, { remetente: usuario, texto: mensagem }]);
+      setMensagens((prev) => [
+        ...prev,
+        { remetente: usuario, texto: mensagem },
+      ]);
       setMensagem("");
     }
   };
 
   return (
-    <div className="bg-white border rounded-lg shadow-lg w-80 p-4 flex flex-col">
+    <div className="flex flex-col h-full">
       {/* Área de mensagens */}
-      <div className="h-48 overflow-y-auto border-b mb-2 p-2 bg-gray-100 rounded">
+      <div className="flex-1 overflow-y-auto p-2 space-y-2 bg-gray-100 rounded-lg">
         {mensagens.length > 0 ? (
           mensagens.map((msg, index) => (
             <div
               key={index}
-              className={`p-2 rounded break-words max-w-full ${
-                msg.remetente === usuario ? "bg-blue-500 text-white self-end" : "bg-gray-300 text-black self-start"
+              className={`max-w-xs p-2 rounded-lg break-words transition-all ${
+                msg.remetente === usuario
+                  ? "bg-blue-500 text-white self-end"
+                  : "bg-gray-300 text-gray-900 self-start"
               }`}
             >
               {msg.texto}
@@ -64,17 +73,17 @@ export default function Chat({ usuario }: ChatProps) {  // Adicionando a tipagem
         <div ref={chatEndRef} />
       </div>
 
-      {/* Entrada de texto e botão */}
-      <div className="flex space-x-2">
+      {/* Entrada de mensagem */}
+      <div className="mt-2 flex items-center">
         <input
           type="text"
           placeholder="Digite sua mensagem..."
           value={mensagem}
           onChange={(e) => setMensagem(e.target.value)}
-          className="border p-2 rounded text-sm flex-1 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="flex-1 border border-gray-300 rounded-l-lg p-2 text-black focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         <button
-          className="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700"
+          className="bg-blue-600 text-white px-1 py-2 rounded-r-lg hover:bg-blue-700 transition"
           onClick={enviarMensagem}
         >
           Enviar
