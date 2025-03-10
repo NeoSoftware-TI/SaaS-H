@@ -3,7 +3,7 @@ create database Clinica;
 use Clinica;
 
 DROP TABLE Usuarios;
--- Todas Tabelas: 'Especializacao' 'Agendamentos' 'Cliente' 'Medico' 'Usuarios' 'Permissoes' 'Prontuario'
+-- Todas Tabelas: 'Especializaçao' 'Agendamentos' 'Prontuario' 'Cliente' 'Medico' 'Usuarios' 'Permissoes'
 
 -- --------------------------------------------------------------------------------------------------------------------------------------- PERMISSÕES
 -- Niveis de permissões da Empresa.
@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS Usuarios (
     ID INTEGER AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(255) NOT NULL,
     cpf CHAR(255) NOT NULL UNIQUE,
+    especialidade VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
     telefone VARCHAR(255) NOT NULL UNIQUE,
     sexo VARCHAR(255) NOT NULL,
@@ -35,13 +36,13 @@ CREATE TABLE IF NOT EXISTS Usuarios (
     FOREIGN KEY (permissao_id) REFERENCES Permissoes(id) ON DELETE RESTRICT
 );
 
-INSERT INTO Usuarios (nome, cpf, email, telefone, sexo, senha, data_nascimento, permissao_id) 
+INSERT INTO Usuarios (nome, cpf, email, especialidade, telefone, sexo, senha, data_nascimento, permissao_id) 
 SELECT 
-    'SaaS-H', '000.000.000-00', 'clinica@hotmail.com', '00 0000-0000', 'NA', SHA2('senha123', 256), '2000-01-01', 4
+    'João Carlos', '200.000.000-00', 'medico@hotmail.com', 'NA', '20 0000-0000', 'NA', SHA2('senha123', 256), '2000-01-01', 2
 WHERE 
     (SELECT CASE 
-        WHEN (SELECT permissao_id FROM Usuarios WHERE id = 5) = 2 AND 1 IN (1) THEN 1 -- ---------------------------------------- Médico (2) pode cadastrar Cliente (1)
-        WHEN (SELECT permissao_id FROM Usuarios WHERE id = 5) = 3 AND 3 IN (1,2) THEN NULL -- ----------------------------------- Sub-Admin (3) pode cadastrar Cliente (1) e Médico (2)
+        WHEN (SELECT permissao_id FROM Usuarios WHERE id = 7) = 2 AND 1 IN (1) THEN 1 -- ---------------------------------------- Médico (2) pode cadastrar Cliente (1)
+        WHEN (SELECT permissao_id FROM Usuarios WHERE id = 6) = 3 AND 3 IN (1,2) THEN NULL -- ----------------------------------- Sub-Admin (3) pode cadastrar Cliente (1) e Médico (2)
         WHEN (SELECT permissao_id FROM Usuarios WHERE id = 5) = 4 THEN 1 -- ----------------------------------------------------- Admin pode cadastrar qualquer um
         ELSE NULL
     END) IS NOT NULL;
@@ -50,16 +51,16 @@ UPDATE Usuarios
 SET nome = 'Desenvolvedor', email = 'Admin@email.com'
 WHERE id = 10
 AND (
-    (SELECT permissao_id FROM Usuarios WHERE id = 5) = 2 AND (SELECT permissao_id FROM usuarios WHERE id = 10) = 1 -- ------------ Médico (2) pode atualizar Cliente (1)
-    OR (SELECT permissao_id FROM Usuarios WHERE id = 5) = 3 AND (SELECT permissao_id FROM usuarios WHERE id = 10) IN (1,2) -- ---- Sub-Admin (3) pode atualizar Cliente (1) e Médico (2)
+    (SELECT permissao_id FROM Usuarios WHERE id = 7) = 2 AND (SELECT permissao_id FROM usuarios WHERE id = 10) = 1 -- ------------ Médico (2) pode atualizar Cliente (1)
+    OR (SELECT permissao_id FROM Usuarios WHERE id = 6) = 3 AND (SELECT permissao_id FROM usuarios WHERE id = 10) IN (1,2) -- ---- Sub-Admin (3) pode atualizar Cliente (1) e Médico (2)
     OR (SELECT permissao_id FROM Usuarios WHERE id = 5) = 4 -- ------------------------------------------------------------------- Admin (4) pode atualizar qualquer um
 );
 
 DELETE FROM Usuarios 
 WHERE id = 10
 AND (
-    (SELECT permissao_id FROM Usuarios WHERE id = 5) = 2 AND (SELECT permissao_id FROM Usuarios WHERE id = 10) = 1 -- ------------ Médico (2) pode excluir Cliente (1)
-    OR (SELECT permissao_id FROM Usuarios WHERE id = 5) = 3 AND (SELECT permissao_id FROM Usuarios WHERE id = 10) IN (1,2) -- ---- Sub-Admin (3) pode excluir Cliente (1) e Médico (2)
+    (SELECT permissao_id FROM Usuarios WHERE id = 7) = 2 AND (SELECT permissao_id FROM Usuarios WHERE id = 10) = 1 -- ------------ Médico (2) pode excluir Cliente (1)
+    OR (SELECT permissao_id FROM Usuarios WHERE id = 6) = 3 AND (SELECT permissao_id FROM Usuarios WHERE id = 10) IN (1,2) -- ---- Sub-Admin (3) pode excluir Cliente (1) e Médico (2)
     OR (SELECT permissao_id FROM Usuarios WHERE id = 5) = 4 -- ------------------------------------------------------------------- Admin (4) pode excluir qualquer um
 );
 
@@ -79,13 +80,13 @@ CREATE TABLE IF NOT EXISTS Cliente (
 );
 
 DELIMITER $$
-CREATE TRIGGER after_Usuario_insert
-AFTER INSERT ON Usuarios
+CREATE TRIGGER after_Usuarios_insert
+AFTER INSERT ON usuarios
 FOR EACH ROW
 BEGIN
     IF NEW.permissao_id = 1 THEN
         INSERT INTO Cliente (usuario_id, nome, cpf, email, telefone, sexo)
-        VALUES (NEW.id, NEW.nome, NEW.cpf, NEW.email, NEW.telefone, NEW.sexo);
+        VALUES (NEW.usuario_id, NEW.nome, NEW.cpf, NEW.email, NEW.telefone, NEW.sexo);
     
     END IF;
 END $$
@@ -106,24 +107,24 @@ CREATE TABLE IF NOT EXISTS Medico (
 );
 
 DELIMITER $$
-CREATE TRIGGER after_usuario_insert
+CREATE TRIGGER after_Usuarios_insert
 AFTER INSERT ON usuarios
 FOR EACH ROW
 BEGIN
     IF NEW.permissao_id = 2 THEN
         SET @especialidade_id = NULL;
 
-        SELECT id INTO @especialidade_id FROM Especializacao WHERE nome = NEW.especialidade LIMIT 1; -- ------ Verifica se a especialidade já existe
+        SELECT id INTO @especialidade_id FROM Especializaçao WHERE nome = NEW.especialidade LIMIT 1; -- ----------- Verifica se a especialidade já existe
         
         IF @especialidade_id IS NULL THEN
-            INSERT INTO Especializacao (especialidade) VALUES (NEW.especialidade); -- ---------- Se não existir, cria a especialidade e obtém seu ID
+            INSERT INTO Especializaçao (especialidade) VALUES (NEW.especialidade); -- --------------- Se não existir, cria a especialidade e obtém seu ID
             SET @especialidade_id = LAST_INSERT_ID();
         END IF;
         
         INSERT INTO Medico (usuario_id, nome, cpf, email, telefone, sexo) -- ----------------- Insere o médico na tabela Médicos e vincula a especialidade
         VALUES (NEW.id, NEW.nome, NEW.cpf, NEW.email, NEW.telefone, NEW.sexo);
         
-        INSERT INTO Especializacao (especialidade, medico_id) 
+        INSERT INTO Especializaçao (especialidade, medico_id) 
 		VALUES (NEW.especialidade, NEW.id);
     
     END IF;
@@ -133,14 +134,14 @@ DELIMITER ;
 -- --------------------------------------------------------------------------------------------------------------------------------------- ESPECIALIZAÇÃO
 -- Tabela da (ESPECIALIZAÇÃO) Onde Registra as Especialização dos Médicos.
 
-CREATE TABLE IF NOT EXISTS Especializacao (
+CREATE TABLE IF NOT EXISTS Especializaçao (
     id INTEGER AUTO_INCREMENT PRIMARY KEY,
     especialidade VARCHAR(255) NOT NULL,
     medico_id INTEGER NOT NULL,
     FOREIGN KEY (medico_id) REFERENCES Medico(id) ON DELETE CASCADE
 );
 
-INSERT INTO Especializacao (especialidade, medico_id)
+INSERT INTO Especializaçao (especialidade, medico_id)
 VALUES
 ('Ortopedia e traumatologia', 1),
 ('Neurologia', 2),
@@ -178,15 +179,15 @@ CREATE TABLE IF NOT EXISTS Agendamentos (
 -- Já registrado
 INSERT INTO Agendamentos (medico_id, usuario_id, data_consulta, horario) 
 VALUES (
-    (SELECT id FROM Medicos WHERE usuario_id = (SELECT id FROM Usuarios WHERE email = 'medico@email.com')),
+    (SELECT id FROM Medico WHERE usuario_id = (SELECT id FROM Usuarios WHERE email = 'medico@email.com')),
     (SELECT id FROM Usuarios WHERE email = 'cliente@email.com'),
     '2024-03-10',
     '14:00:00'
 );
 
 -- Sem Registro
-INSERT INTO Usuarios (nome, cpf, email, telefone, sexo, senha, data_nascimento, permissao_id)
-SELECT 'João Gomes', '000.000.000-00', 'cliente@email.com', '00 0000-0000', 'NA', SHA2('senha123', 256), 2000-01-01, 2
+INSERT INTO Usuarios (nome, cpf, email, especialidade, telefone, sexo, senha, data_nascimento, permissao_id)
+SELECT 'João Gomes', '000.000.000-00', 'cliente@email.com', 'NA', '00 0000-0000', 'NA', SHA2('senha123', 256), 2000-01-01, 2
 WHERE NOT EXISTS (SELECT 1 FROM Usuarios WHERE email = 'cliente@email.com');
 
 INSERT INTO Agendamentos (medico_id, usuario_id, data_consulta, horario)
@@ -201,7 +202,7 @@ VALUES (
 -- Uma seleção que traz o dashboard de todas as consultas que o médico teve na semana separado por dia, contendo seus nomes de (Segunda a Sexta-feira).
 
 SELECT 
-    medicos.id AS id_medico,
+    medico.id AS id_medico,
     usuarios.nome AS nome_medico,
     SUM(CASE WHEN WEEKDAY(agendamentos.data_consulta) = 0 THEN 1 ELSE 0 END) AS segunda_feira,
     SUM(CASE WHEN WEEKDAY(agendamentos.data_consulta) = 1 THEN 1 ELSE 0 END) AS terca_feira,
@@ -209,11 +210,11 @@ SELECT
     SUM(CASE WHEN WEEKDAY(agendamentos.data_consulta) = 3 THEN 1 ELSE 0 END) AS quinta_feira,
     SUM(CASE WHEN WEEKDAY(agendamentos.data_consulta) = 4 THEN 1 ELSE 0 END) AS sexta_feira
 FROM agendamentos
-JOIN medicos ON agendamentos.medico_id = medicos.id
-JOIN usuarios ON medicos.usuario_id = usuarios.id
+JOIN medico ON agendamentos.medico_id = medico.id
+JOIN usuarios ON medico.usuario_id = usuarios.id
 WHERE agendamentos.data_consulta BETWEEN CURDATE() - INTERVAL WEEKDAY(CURDATE()) DAY 
                                     AND CURDATE() + INTERVAL (4 - WEEKDAY(CURDATE())) DAY
-GROUP BY medicos.id, usuarios.nome
+GROUP BY medico.id, usuarios.nome
 ORDER BY usuarios.nome;
 
 -- --------------------------------------------------------------------------------------------------------------------------------------- DASHBOARD DO MÉDICO
@@ -221,14 +222,14 @@ ORDER BY usuarios.nome;
 
 SELECT 
     Usuarios_medico.nome AS nome_medico,
-    Especializacao.especialidade AS especialidade_medico,
-    Usuarios_paciente.nome AS nome_paciente,
+    Especializaçao.especialidade AS especialidade_medico,
+    Usuarios_cliente.nome AS nome_paciente,
     Agendamentos.data_consulta AS data_consulta,
     Agendamentos.horario AS horario_consulta
 FROM agendamentos
-JOIN medicos ON agendamentos.medico_id = medicos.id
-JOIN usuarios AS usuarios_medico ON medicos.usuario_id = usuarios_medico.id 
-JOIN especializacao ON medicos.id = especializacao.medico_id
+JOIN medico ON agendamentos.medico_id = medico.id
+JOIN usuarios AS usuarios_medico ON medico.usuario_id = usuarios_medico.id 
+JOIN especializaçao ON medicos.id = especializaçao.medico_id
 JOIN usuarios AS usuarios_paciente ON agendamentos.usuario_id = usuarios_paciente.id
 WHERE agendamentos.data_consulta = CURDATE()
 ORDER BY agendamentos.horario;
@@ -308,4 +309,4 @@ WHERE Prontuario.cliente_id = (
     WHERE email = 'cliente@email.com'
 );
 
--- --------------------------------------------------------------------------------------------------------------------------------------- FIM
+-- --------------------------------------------------------------------------------------------------------------------------------------- FIM DO PROJETO
