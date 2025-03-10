@@ -23,7 +23,7 @@ INSERT INTO Permissoes (nivel) VALUES
 -- Tabela dos (USUARIOS) sendo eles (ADMIN, SUB-ADMIN, MÉDICOS E CLIENTES) e seu COMANDO para registrar os mesmos.
 
 CREATE TABLE IF NOT EXISTS Usuarios (
-    ID INTEGER AUTO_INCREMENT PRIMARY KEY,
+    id INTEGER AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(255) NOT NULL,
     cpf CHAR(255) NOT NULL UNIQUE,
     especialidade VARCHAR(255) NOT NULL,
@@ -114,7 +114,7 @@ BEGIN
     IF NEW.permissao_id = 2 THEN
         SET @especialidade_id = NULL;
 
-        SELECT id INTO @especialidade_id FROM Especializaçao WHERE nome = NEW.especialidade LIMIT 1; -- ----------- Verifica se a especialidade já existe
+        SELECT id INTO @especialidade_id FROM Especializaçao WHERE especialidade = NEW.especialidade LIMIT 1; -- ----------- Verifica se a especialidade já existe
         
         IF @especialidade_id IS NULL THEN
             INSERT INTO Especializaçao (especialidade) VALUES (NEW.especialidade); -- --------------- Se não existir, cria a especialidade e obtém seu ID
@@ -125,7 +125,7 @@ BEGIN
         VALUES (NEW.id, NEW.nome, NEW.cpf, NEW.email, NEW.telefone, NEW.sexo);
         
         INSERT INTO Especializaçao (especialidade, medico_id) 
-		VALUES (NEW.especialidade, NEW.id);
+		VALUES (NEW.especialidade, (SELECT id FROM Medico WHERE usuario_id = NEW.id));
     
     END IF;
 END $$
