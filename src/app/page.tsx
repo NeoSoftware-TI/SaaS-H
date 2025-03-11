@@ -1,8 +1,8 @@
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/src/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card"
 import Link from "next/link"
 import { ArrowRight, Building2, Stethoscope, Users } from "lucide-react"
-import { NavLinks } from "@/components/nav-links"
+import { NavLinks } from "@/src/components/nav-links"
 
 export default function Home() {
   return (

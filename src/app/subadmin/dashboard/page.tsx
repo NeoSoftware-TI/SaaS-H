@@ -3,11 +3,11 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { SubadminLayout } from "@/components/layouts/subadmin-layout"
-import { DataTable } from "@/components/data-table"
+import { Button } from "@/src/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs"
+import { SubadminLayout } from "@/src/components/layouts/subadmin-layout"
+import { DataTable } from "@/src/components/data-table"
 import {
   Dialog,
   DialogContent,
@@ -16,12 +16,12 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+} from "@/src/components/ui/dialog"
+import { Input } from "@/src/components/ui/input"
+import { Label } from "@/src/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/src/components/ui/select"
 import { BarChart, FileText, Stethoscope, Users } from "lucide-react"
-import { getMedicos, createMedico, updateMedico, deleteMedico } from "@/lib/subadmin"
+import { getMedicos, createMedico, updateMedico, deleteMedico } from "@/src/lib/subadmin"
 import {
   AlertDialog,
   AlertDialogContent,
@@ -29,7 +29,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
+} from "@/src/components/ui/alert-dialog"
 
 interface Medico {
   id: string

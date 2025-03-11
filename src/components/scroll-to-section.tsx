@@ -1,10 +1,10 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/src/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card"
 import Link from "next/link"
 import { ArrowRight, Building2, Mail, MapPin, Phone, Stethoscope, Users } from "lucide-react"
-import ScrollToSection from "@/components/scroll-to-section"
+import ScrollToSection from "@/src/components/scroll-to-section"
 
 export default function Home() {
   const scrollToSection = (id: string) => {

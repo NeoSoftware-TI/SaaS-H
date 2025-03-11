@@ -3,11 +3,11 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { MedicoLayout } from "@/components/layouts/medico-layout"
-import { DataTable } from "@/components/data-table"
+import { Button } from "@/src/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs"
+import { MedicoLayout } from "@/src/components/layouts/medico-layout"
+import { DataTable } from "@/src/components/data-table"
 import {
   Dialog,
   DialogContent,
@@ -16,13 +16,13 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Calendar } from "@/components/ui/calendar"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+} from "@/src/components/ui/dialog"
+import { Input } from "@/src/components/ui/input"
+import { Label } from "@/src/components/ui/label"
+import { Textarea } from "@/src/components/ui/textarea"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/src/components/ui/select"
+import { Calendar } from "@/src/components/ui/calendar"
+import { Popover, PopoverContent, PopoverTrigger } from "@/src/components/ui/popover"
 import { CalendarIcon, ClipboardList, Clock, Users } from "lucide-react"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
@@ -33,7 +33,7 @@ import {
   createPaciente,
   updatePaciente,
   deletePaciente,
-} from "@/lib/medico"
+} from "@/src/lib/medico"
 import {
   AlertDialog,
   AlertDialogContent,
@@ -41,7 +41,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
+} from "@/src/components/ui/alert-dialog"
 
 // Definindo interfaces para os tipos
 interface Consulta {

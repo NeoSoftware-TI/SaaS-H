@@ -12,9 +12,9 @@ import {
   type ColumnFiltersState,
   getFilteredRowModel,
 } from "@tanstack/react-table"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Input } from "@/src/components/ui/input"
+import { Button } from "@/src/components/ui/button"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/src/components/ui/table"
 import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react"
 
 interface DataTableProps<TData, TValue> {

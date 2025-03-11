@@ -5,10 +5,10 @@ import type React from "react"
 import { useState } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { Button } from "@/src/components/ui/button"
+import { Avatar, AvatarFallback, AvatarImage } from "@/src/components/ui/avatar"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/src/components/ui/dropdown-menu"
+import { Sheet, SheetContent, SheetTrigger } from "@/src/components/ui/sheet"
 import {
   Bell,
   Calendar,
@@ -21,7 +21,7 @@ import {
   User,
   Users,
 } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { cn } from "@/src/lib/utils"
 
 interface MedicoLayoutProps {
   children: React.ReactNode
