@@ -1,8 +1,8 @@
 create database Clinica;
 
-use Cliente;
+use Clinica;
 
-DROP TABLE agendamento, prontuario, cliente, medico, usuario; -- Tabelas:  permissao, agendamento, prontuario, cliente, medico, admin, subadmin, clinica1, clinica2, clinica3
+DROP TABLE prontuario; -- Tabelas:  permissao, agendamento, prontuario, cliente, medico, admin, subadmin, `Clínica Serenity`, `Clínica InnovateHealth`, `Clínica QualityCare`;
 
 -- ------------------------------------------------------------------------------------------------------------------------------------- TABELAS - Armazenamento dos Dados
 
@@ -78,7 +78,7 @@ CREATE TABLE IF NOT EXISTS agendamento (
     clinica_nome VARCHAR(255) NOT NULL,
     data_consulta DATE NOT NULL,
     horario TIME NOT NULL,
-    FOREIGN KEY (medico_id) REFERENCES medico(id) ON DELETE RESTRICT,
+    FOREIGN KEY (medico_id) REFERENCES medico(id) ON DELETE CASCADE,
     UNIQUE (medico_id, data_consulta, horario)
 );
 
@@ -92,7 +92,7 @@ CREATE TABLE IF NOT EXISTS prontuario (
     diagnostico TEXT,
     descriçao_do_resultado TEXT,
     medicamentos_prescritos TEXT,
-    fumante ENUM('S', 'N') NOT NULL,
+    fumante ENUM('Sim', 'Não') NOT NULL,
     FOREIGN KEY (cliente_id) REFERENCES cliente(id) ON DELETE CASCADE,
     FOREIGN KEY (medico_id) REFERENCES medico(id) ON DELETE CASCADE
 );
@@ -103,28 +103,22 @@ CREATE TABLE IF NOT EXISTS `Clínica Serenity` (
     id INTEGER AUTO_INCREMENT PRIMARY KEY,
     cliente_id INTEGER NOT NULL,
     medico_id INTEGER NOT NULL,
-    FOREIGN KEY (cliente_id) REFERENCES cliente(id) ON DELETE CASCADE,
-    FOREIGN KEY (subadmin_id) REFERENCES subadmin(id) ON DELETE CASCADE,
-    FOREIGN KEY (medico_id) REFERENCES medico(id) ON DELETE CASCADE,
-    FOREIGN KEY (agendamento_id) REFERENCES agendamento(id) ON DELETE CASCADE
+    subadmin_id INTEGER NOT NULL,
+	agendamento_id INTEGER NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS `Clínica InnovateHealth` (
     id INTEGER AUTO_INCREMENT PRIMARY KEY,
     cliente_id INTEGER NOT NULL,
     medico_id INTEGER NOT NULL,
-    FOREIGN KEY (cliente_id) REFERENCES cliente(id) ON DELETE CASCADE,
-    FOREIGN KEY (subadmin_id) REFERENCES subadmin(id) ON DELETE CASCADE,
-    FOREIGN KEY (medico_id) REFERENCES medico(id) ON DELETE CASCADE,
-    FOREIGN KEY (agendamento_id) REFERENCES agendamento(id) ON DELETE CASCADE
+    subadmin_id INTEGER NOT NULL,
+	agendamento_id INTEGER NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS `Clínica QualityCare` (
     id INTEGER AUTO_INCREMENT PRIMARY KEY,
     cliente_id INTEGER NOT NULL,
     medico_id INTEGER NOT NULL,
-    FOREIGN KEY (cliente_id) REFERENCES cliente(id) ON DELETE CASCADE,
-    FOREIGN KEY (subadmin_id) REFERENCES subadmin(id) ON DELETE CASCADE,
-    FOREIGN KEY (medico_id) REFERENCES medico(id) ON DELETE CASCADE,
-    FOREIGN KEY (agendamento_id) REFERENCES agendamento(id) ON DELETE CASCADE
+    subadmin_id INTEGER NOT NULL,
+	agendamento_id INTEGER NOT NULL
 );

@@ -9,11 +9,11 @@ AFTER INSERT ON subadmin
 FOR EACH ROW
 BEGIN
     IF NEW.clinica_nome = 'Clínica Serenity' THEN
-        INSERT INTO `Clínica Serenity` (subadmin_id) VALUES (NEW.id);
+        INSERT INTO `Clínica Serenity` (cliente_id, medico_id, agendamento_id, subadmin_id) VALUES (0, 0, 0, NEW.id);
     ELSEIF NEW.clinica_nome = 'Clínica InnovateHealth' THEN
-        INSERT INTO `Clínica InnovateHealth` (subadmin_id) VALUES (NEW.id);
+        INSERT INTO `Clínica InnovateHealth` (cliente_id, medico_id, agendamento_id, subadmin_id) VALUES (0, 0, 0, NEW.id);
     ELSEIF NEW.clinica_nome = 'Clínica QualityCare' THEN
-        INSERT INTO `Clínica QualityCare` (subadmin_id) VALUES (NEW.id);
+        INSERT INTO `Clínica QualityCare` (cliente_id, medico_id, agendamento_id, subadmin_id) VALUES (0, 0, 0, NEW.id);
     END IF;
 END$$
 DELIMITER ;
@@ -25,11 +25,11 @@ AFTER INSERT ON medico
 FOR EACH ROW
 BEGIN
     IF NEW.clinica_nome = 'Clínica Serenity' THEN
-        INSERT INTO `Clínica Serenity` (medico_id) VALUES (NEW.id);
+        INSERT INTO `Clínica Serenity` (cliente_id, medico_id, agendamento_id, subadmin_id) VALUES (0, NEW.id, 0, 0);
     ELSEIF NEW.clinica_nome = 'Clínica InnovateHealth' THEN
-        INSERT INTO `Clínica InnovateHealth` (medico_id) VALUES (NEW.id);
+        INSERT INTO `Clínica InnovateHealth` (cliente_id, medico_id, agendamento_id, subadmin_id) VALUES (0, NEW.id, 0, 0);
     ELSEIF NEW.clinica_nome = 'Clínica QualityCare' THEN
-        INSERT INTO `Clínica QualityCare` (medico_id) VALUES (NEW.id);
+        INSERT INTO `Clínica QualityCare` (cliente_id, medico_id, agendamento_id, subadmin_id) VALUES (0, NEW.id, 0, 0);
     END IF;
 END$$
 DELIMITER ;
@@ -41,36 +41,60 @@ AFTER INSERT ON cliente
 FOR EACH ROW
 BEGIN
     IF NEW.clinica_nome = 'Clínica Serenity' THEN
-        INSERT INTO `Clínica Serenity` (cliente_id) VALUES (NEW.id);
+        INSERT INTO `Clínica Serenity` (cliente_id, medico_id, agendamento_id, subadmin_id) VALUES (NEW.id, 0, 0, 0);
     ELSEIF NEW.clinica_nome = 'Clínica InnovateHealth' THEN
-        INSERT INTO `Clínica InnovateHealth` (cliente_id) VALUES (NEW.id);
+        INSERT INTO `Clínica InnovateHealth` (cliente_id, medico_id, agendamento_id, subadmin_id) VALUES (NEW.id, 0, 0, 0);
     ELSEIF NEW.clinica_nome = 'Clínica QualityCare' THEN
-        INSERT INTO `Clínica QualityCare` (cliente_id) VALUES (NEW.id);
+        INSERT INTO `Clínica QualityCare` (cliente_id, medico_id, agendamento_id, subadmin_id) VALUES (NEW.id, 0, 0, 0);
     END IF;
 END$$
 DELIMITER ;
 
 -- ---------------------------------------------------------------------- PRONTUARIO - Inserir as Informações no Prontuario após um Cliente Agendar se ainda não Tem.
 DELIMITER $$
+
 CREATE TRIGGER after_agendamento_insert
 AFTER INSERT ON agendamento
 FOR EACH ROW
 BEGIN
     IF NEW.clinica_nome = 'Clínica Serenity' THEN
-        INSERT INTO `Clínica Serenity` (agendamento_id) VALUES (NEW.id);
+        INSERT INTO `Clínica Serenity` (cliente_id, medico_id, agendamento_id, subadmin_id)
+        VALUES (NEW.cliente_id, NEW.medico_id, NEW.id, 0);
     ELSEIF NEW.clinica_nome = 'Clínica InnovateHealth' THEN
-        INSERT INTO `Clínica InnovateHealth` (agendamento_id) VALUES (NEW.id);
+        INSERT INTO `Clínica InnovateHealth` (cliente_id, medico_id, agendamento_id, subadmin_id)
+        VALUES (NEW.cliente_id, NEW.medico_id, NEW.id, 0);
     ELSEIF NEW.clinica_nome = 'Clínica QualityCare' THEN
-        INSERT INTO `Clínica QualityCare` (agendamento_id) VALUES (NEW.id);
-        
-    IF NOT EXISTS ( -- Verifica se já existe um prontuário para este cliente com este Médico.
-        SELECT 1 
-        FROM prontuario 
-        WHERE cliente_id = NEW.usuario_id 
+        INSERT INTO `Clínica QualityCare` (cliente_id, medico_id, agendamento_id, subadmin_id)
+        VALUES (NEW.cliente_id, NEW.medico_id, NEW.id, 0);
+    END IF;
+
+    IF NOT EXISTS (
+        SELECT 1
+        FROM prontuario
+        WHERE cliente_id = NEW.cliente_id 
         AND medico_id = NEW.medico_id
     ) THEN
-        INSERT INTO prontuario (cliente_id, medico_id, data_criacao, exame_realizado, diagnostico, descriçao_do_resultado, medicamentos_prescritos, fumante)
-        VALUES (NEW.usuario_id, NEW.medico_id, 'HEMOGRAMA COMPLETO', 'COLERA DEVIDA A VIBRIO CHOLERAE 01, BIOTIPO CHOLERAE', 'NORMAL', 'DIPIRONA - 1 Comprimido ao dia', 'S/N');
+        INSERT INTO prontuario (
+            cliente_id, 
+            medico_id, 
+            data_criacao, 
+            exame_realizado, 
+            diagnostico, 
+            descriçao_do_resultado, 
+            medicamentos_prescritos, 
+            fumante
+        )
+        VALUES (
+            NEW.cliente_id, 
+            NEW.medico_id, 
+            CURRENT_TIMESTAMP, 
+            'HEMOGRAMA COMPLETO', 
+            'COLERA DEVIDA A VIBRIO CHOLERAE 01, BIOTIPO CHOLERAE', 
+            'NORMAL', 
+            'DIPIRONA - 1 Comprimido ao dia', 
+            'Não'
+        );
     END IF;
 END $$
+
 DELIMITER ;
