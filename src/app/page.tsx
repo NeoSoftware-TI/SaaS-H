@@ -197,7 +197,7 @@ export default function Home() {
                             d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                           />
                         </svg>
-                        <span>Av. Paulista, 1000 - São Paulo, SP</span>
+                        <span>Av. Fulano, 1000 - Vitoria, ES</span>
                       </li>
                     </ul>
                   </div>

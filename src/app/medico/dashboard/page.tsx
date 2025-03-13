@@ -3,6 +3,7 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
+import { useSearchParams } from "next/navigation"
 import { Button } from "@/src/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs"
@@ -23,7 +24,7 @@ import { Textarea } from "@/src/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/src/components/ui/select"
 import { Calendar } from "@/src/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/src/components/ui/popover"
-import { CalendarIcon, ClipboardList, Clock, Users } from "lucide-react"
+import { CalendarIcon, ClipboardList, Clock, Pencil, Trash2, Users } from "lucide-react"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
 import {
@@ -66,6 +67,12 @@ interface Paciente {
 }
 
 export default function MedicoDashboard() {
+  const searchParams = useSearchParams()
+  const tabParam = searchParams.get("tab")
+
+  // Define a tab ativa com base no parâmetro da URL ou usa "agenda" como padrão
+  const [activeTab, setActiveTab] = useState(tabParam || "agenda")
+
   const [consultas, setConsultas] = useState<Consulta[]>([])
   const [pacientes, setPacientes] = useState<Paciente[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -76,6 +83,8 @@ export default function MedicoDashboard() {
   const [currentPaciente, setCurrentPaciente] = useState<Paciente | null>(null)
   const [pacienteToDelete, setPacienteToDelete] = useState<Paciente | null>(null)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [selectedPaciente, setSelectedPaciente] = useState<Paciente | null>(null)
+  const [detailsDialogOpen, setDetailsDialogOpen] = useState(false)
 
   const [consultaForm, setConsultaForm] = useState({
     pacienteId: "",
@@ -96,7 +105,12 @@ export default function MedicoDashboard() {
 
   useEffect(() => {
     loadData()
-  }, [])
+
+    // Atualiza a tab ativa quando o parâmetro da URL muda
+    if (tabParam) {
+      setActiveTab(tabParam)
+    }
+  }, [tabParam])
 
   const loadData = async () => {
     setIsLoading(true)
@@ -154,6 +168,11 @@ export default function MedicoDashboard() {
   const handleDeletePaciente = (paciente: Paciente) => {
     setPacienteToDelete(paciente)
     setDeleteDialogOpen(true)
+  }
+
+  const handleViewDetails = (paciente: Paciente) => {
+    setSelectedPaciente(paciente)
+    setDetailsDialogOpen(true)
   }
 
   const handleCancelDelete = () => {
@@ -278,11 +297,11 @@ export default function MedicoDashboard() {
       id: "actions",
       cell: ({ row }: { row: { original: Consulta } }) => (
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm">
-            Atender
+          <Button variant="ghost" size="icon" title="Atender">
+            <ClipboardList className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="sm">
-            Prontuário
+          <Button variant="ghost" size="icon" title="Prontuário">
+            <Clock className="h-4 w-4" />
           </Button>
         </div>
       ),
@@ -294,6 +313,14 @@ export default function MedicoDashboard() {
     {
       accessorKey: "nome",
       header: "Nome",
+      cell: ({ row }: { row: { original: Paciente } }) => (
+        <button
+          className="text-primary hover:underline text-left font-medium"
+          onClick={() => handleViewDetails(row.original)}
+        >
+          {row.original.nome}
+        </button>
+      ),
     },
     {
       accessorKey: "cpf",
@@ -315,19 +342,17 @@ export default function MedicoDashboard() {
       id: "actions",
       cell: ({ row }: { row: { original: Paciente } }) => (
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm">
-            Prontuário
-          </Button>
-          <Button variant="ghost" size="sm" onClick={() => handleEditPaciente(row.original)}>
-            Editar
+          <Button variant="ghost" size="icon" onClick={() => handleEditPaciente(row.original)} title="Editar">
+            <Pencil className="h-4 w-4" />
           </Button>
           <Button
             variant="ghost"
-            size="sm"
+            size="icon"
             className="text-destructive"
             onClick={() => handleDeletePaciente(row.original)}
+            title="Remover"
           >
-            Remover
+            <Trash2 className="h-4 w-4" />
           </Button>
         </div>
       ),
@@ -373,7 +398,7 @@ export default function MedicoDashboard() {
         </Card>
       </div>
 
-      <Tabs defaultValue="agenda" className="space-y-4">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList>
           <TabsTrigger value="agenda">Agenda</TabsTrigger>
           <TabsTrigger value="pacientes">Pacientes</TabsTrigger>
@@ -632,6 +657,61 @@ export default function MedicoDashboard() {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+      )}
+
+      {/* Diálogo de detalhes do paciente */}
+      {selectedPaciente && (
+        <Dialog open={detailsDialogOpen} onOpenChange={setDetailsDialogOpen}>
+          <DialogContent className="sm:max-w-[500px]">
+            <DialogHeader>
+              <DialogTitle>Detalhes do Paciente</DialogTitle>
+              <DialogDescription>Informações completas do paciente selecionado</DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-[120px_1fr] items-center gap-2">
+                <span className="font-medium text-muted-foreground">Nome:</span>
+                <span>{selectedPaciente.nome}</span>
+              </div>
+              <div className="grid grid-cols-[120px_1fr] items-center gap-2">
+                <span className="font-medium text-muted-foreground">CPF:</span>
+                <span>{selectedPaciente.cpf}</span>
+              </div>
+              <div className="grid grid-cols-[120px_1fr] items-center gap-2">
+                <span className="font-medium text-muted-foreground">Data Nasc.:</span>
+                <span>{selectedPaciente.dataNascimento}</span>
+              </div>
+              <div className="grid grid-cols-[120px_1fr] items-center gap-2">
+                <span className="font-medium text-muted-foreground">Telefone:</span>
+                <span>{selectedPaciente.telefone}</span>
+              </div>
+              <div className="grid grid-cols-[120px_1fr] items-center gap-2">
+                <span className="font-medium text-muted-foreground">E-mail:</span>
+                <span>{selectedPaciente.email}</span>
+              </div>
+              <div className="grid grid-cols-[120px_1fr] items-center gap-2">
+                <span className="font-medium text-muted-foreground">Endereço:</span>
+                <span>{selectedPaciente.endereco}</span>
+              </div>
+              <div className="grid grid-cols-[120px_1fr] items-center gap-2">
+                <span className="font-medium text-muted-foreground">Última Consulta:</span>
+                <span>{selectedPaciente.ultimaConsulta}</span>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setDetailsDialogOpen(false)}>
+                Fechar
+              </Button>
+              <Button
+                onClick={() => {
+                  setDetailsDialogOpen(false)
+                  handleEditPaciente(selectedPaciente)
+                }}
+              >
+                Editar
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       )}
     </MedicoLayout>
   )

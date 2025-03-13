@@ -1,10 +1,9 @@
 "use client"
 
-import { AlertDialogFooter } from "@/src/components/ui/alert-dialog"
-
 import type React from "react"
 
 import { useState, useEffect } from "react"
+import { useSearchParams } from "next/navigation"
 import { Button } from "@/src/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs"
@@ -22,12 +21,13 @@ import {
 import { Input } from "@/src/components/ui/input"
 import { Label } from "@/src/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/src/components/ui/select"
-import { BarChart, Building2, Users } from "lucide-react"
+import { BarChart, Building2, Pencil, Trash2, Users } from "lucide-react"
 import { getSubadmins, createSubadmin, updateSubadmin, deleteSubadmin } from "@/src/lib/admin"
 import {
   AlertDialog,
   AlertDialogContent,
   AlertDialogDescription,
+  AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/src/components/ui/alert-dialog"
@@ -51,6 +51,12 @@ interface FaturamentoItem {
 }
 
 export default function AdminDashboard() {
+  const searchParams = useSearchParams()
+  const tabParam = searchParams.get("tab")
+
+  // Define a tab ativa com base no parâmetro da URL ou usa "subadmins" como padrão
+  const [activeTab, setActiveTab] = useState(tabParam || "subadmins")
+
   const [subadmins, setSubadmins] = useState<Subadmin[]>([])
   const [faturamento, setFaturamento] = useState<FaturamentoItem[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -59,6 +65,8 @@ export default function AdminDashboard() {
   const [currentSubadmin, setCurrentSubadmin] = useState<Subadmin | null>(null)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [subadminToDelete, setSubadminToDelete] = useState<Subadmin | null>(null)
+  const [selectedSubadmin, setSelectedSubadmin] = useState<Subadmin | null>(null)
+  const [detailsDialogOpen, setDetailsDialogOpen] = useState(false)
   const [formData, setFormData] = useState({
     nome: "",
     email: "",
@@ -69,7 +77,12 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     loadSubadmins()
-  }, [])
+
+    // Atualiza a tab ativa quando o parâmetro da URL muda
+    if (tabParam) {
+      setActiveTab(tabParam)
+    }
+  }, [tabParam])
 
   const loadSubadmins = async () => {
     setIsLoading(true)
@@ -110,6 +123,16 @@ export default function AdminDashboard() {
     setDeleteDialogOpen(true)
   }
 
+  const handleViewDetails = (subadmin: Subadmin) => {
+    setSelectedSubadmin(subadmin)
+    setDetailsDialogOpen(true)
+  }
+
+  const handleCancelDelete = () => {
+    setDeleteDialogOpen(false)
+    setSubadminToDelete(null)
+  }
+
   const confirmDelete = async () => {
     if (!subadminToDelete) return
 
@@ -124,11 +147,6 @@ export default function AdminDashboard() {
       setDeleteDialogOpen(false)
       setSubadminToDelete(null)
     }
-  }
-
-  const handleCancelDelete = () => {
-    setDeleteDialogOpen(false)
-    setSubadminToDelete(null)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -181,6 +199,14 @@ export default function AdminDashboard() {
     {
       accessorKey: "nome",
       header: "Nome",
+      cell: ({ row }: { row: { original: Subadmin } }) => (
+        <button
+          className="text-primary hover:underline text-left font-medium"
+          onClick={() => handleViewDetails(row.original)}
+        >
+          {row.original.nome}
+        </button>
+      ),
     },
     {
       accessorKey: "email",
@@ -207,11 +233,17 @@ export default function AdminDashboard() {
       id: "actions",
       cell: ({ row }: { row: { original: Subadmin } }) => (
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm" onClick={() => handleEdit(row.original)}>
-            Editar
+          <Button variant="ghost" size="icon" onClick={() => handleEdit(row.original)} title="Editar">
+            <Pencil className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="sm" className="text-destructive" onClick={() => handleDelete(row.original)}>
-            Remover
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-destructive"
+            onClick={() => handleDelete(row.original)}
+            title="Remover"
+          >
+            <Trash2 className="h-4 w-4" />
           </Button>
         </div>
       ),
@@ -257,7 +289,7 @@ export default function AdminDashboard() {
         </Card>
       </div>
 
-      <Tabs defaultValue="subadmins" className="space-y-4">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList>
           <TabsTrigger value="subadmins">Subadministradores</TabsTrigger>
           <TabsTrigger value="relatorios">Relatórios</TabsTrigger>
@@ -433,6 +465,55 @@ export default function AdminDashboard() {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+      )}
+
+      {/* Diálogo de detalhes do subadmin */}
+      {selectedSubadmin && (
+        <Dialog open={detailsDialogOpen} onOpenChange={setDetailsDialogOpen}>
+          <DialogContent className="sm:max-w-[500px]">
+            <DialogHeader>
+              <DialogTitle>Detalhes do Subadministrador</DialogTitle>
+              <DialogDescription>Informações completas do subadministrador selecionado</DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-[120px_1fr] items-center gap-2">
+                <span className="font-medium text-muted-foreground">Nome:</span>
+                <span>{selectedSubadmin.nome}</span>
+              </div>
+              <div className="grid grid-cols-[120px_1fr] items-center gap-2">
+                <span className="font-medium text-muted-foreground">E-mail:</span>
+                <span>{selectedSubadmin.email}</span>
+              </div>
+              <div className="grid grid-cols-[120px_1fr] items-center gap-2">
+                <span className="font-medium text-muted-foreground">Clínica:</span>
+                <span>{selectedSubadmin.clinica}</span>
+              </div>
+              <div className="grid grid-cols-[120px_1fr] items-center gap-2">
+                <span className="font-medium text-muted-foreground">Status:</span>
+                <div
+                  className={`px-2 py-1 rounded-full text-xs font-medium inline-block ${
+                    selectedSubadmin.status === "Ativo" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+                  }`}
+                >
+                  {selectedSubadmin.status}
+                </div>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setDetailsDialogOpen(false)}>
+                Fechar
+              </Button>
+              <Button
+                onClick={() => {
+                  setDetailsDialogOpen(false)
+                  handleEdit(selectedSubadmin)
+                }}
+              >
+                Editar
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       )}
     </AdminLayout>
   )
