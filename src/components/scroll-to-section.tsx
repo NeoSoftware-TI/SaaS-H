@@ -1,22 +1,52 @@
+"use client"
+
 import { Button } from "@/src/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card"
 import Link from "next/link"
-import { ArrowRight, Building2, Stethoscope, Users } from "lucide-react"
-import { NavLinks } from "@/src/components/nav-links"
+import { ArrowRight, Building2, Mail, MapPin, Phone, Stethoscope, Users } from "lucide-react"
+import ScrollToSection from "@/src/components/scroll-to-section"
 
 export default function Home() {
+  // Função para rolagem suave até uma seção específica
+  const scrollToSection = (id: string) => {
+    const element = document.getElementById(id)
+    if (element) element.scrollIntoView({ behavior: "smooth" })
+  }
+
   return (
     <div className="flex min-h-screen flex-col">
+      {/* Componente para rolagem (pode conter lógica para scroll observável) */}
+      <ScrollToSection />
+
       {/* Navbar */}
       <header className="sticky top-0 z-50 w-full border-b bg-white shadow-sm">
         <div className="container flex h-14 items-center">
+          {/* Logo e links de navegação (visível em desktop) */}
           <div className="mr-4 hidden md:flex">
             <Link href="/" className="mr-6 flex items-center space-x-2">
               <Stethoscope className="h-6 w-6" />
               <span className="hidden font-bold sm:inline-block">ClinicaGestão</span>
             </Link>
-            <NavLinks />
+            <nav className="flex items-center space-x-6 text-sm font-medium">
+              <button
+                onClick={() => scrollToSection("features")}
+                className="transition-colors hover:text-foreground/80 text-foreground/60"
+              >
+                Sobre
+              </button>
+              <Link href="/precos" className="transition-colors hover:text-foreground/80 text-foreground/60">
+                Preços
+              </Link>
+              <button
+                onClick={() => scrollToSection("contato")}
+                className="transition-colors hover:text-foreground/80 text-foreground/60"
+              >
+                Contato
+              </button>
+            </nav>
           </div>
+
+          {/* Botões de acesso */}
           <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
             <div className="w-full flex-1 md:w-auto md:flex-none">
               <Button asChild variant="outline" className="ml-auto hidden md:flex">
@@ -58,6 +88,7 @@ export default function Home() {
                   </Button>
                 </div>
               </div>
+              {/* Imagem ilustrativa */}
               <img
                 src="/placeholder.svg?height=550&width=800"
                 alt="Dashboard da plataforma"
@@ -134,7 +165,7 @@ export default function Home() {
         </section>
 
         {/* Seção de Contato */}
-        <section id="contato" className="w-full py-12 md:py-24 lg:py-32 bg-background">
+        <section id="contato" className="w-full py-12 md:py-24 lg:py-32 bg-white border-t">
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
@@ -144,47 +175,50 @@ export default function Home() {
                 </p>
               </div>
             </div>
-            <div className="mx-auto max-w-3xl mt-8">
+            <div className="mx-auto max-w-3xl mt-12">
               <div className="grid gap-8 md:grid-cols-2">
                 {/* Informações de Contato */}
-                <div className="space-y-4">
+                <div className="space-y-6">
                   <div>
-                    <h3 className="text-lg font-medium">Informações de contato</h3>
-                    <ul className="mt-4 space-y-3 text-sm">
-                      <li className="flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                        </svg>
-                        <span>(11) 4321-1234</span>
+                    <h3 className="text-xl font-semibold mb-4">Informações de contato</h3>
+                    <ul className="space-y-4">
+                      <li className="flex items-start">
+                        <Phone className="h-5 w-5 mr-3 text-primary mt-0.5" />
+                        <div>
+                          <p className="font-medium">Telefone</p>
+                          <p className="text-muted-foreground">(11) 4321-1234</p>
+                        </div>
                       </li>
-                      <li className="flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                        </svg>
-                        <span>contato@clinicagestao.com.br</span>
+                      <li className="flex items-start">
+                        <Mail className="h-5 w-5 mr-3 text-primary mt-0.5" />
+                        <div>
+                          <p className="font-medium">E-mail</p>
+                          <p className="text-muted-foreground">contato@clinicagestao.com.br</p>
+                        </div>
                       </li>
-                      <li className="flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
-                        <span>Av. Fulano, 1000 - Vitoria, ES</span>
+                      <li className="flex items-start">
+                        <MapPin className="h-5 w-5 mr-3 text-primary mt-0.5" />
+                        <div>
+                          <p className="font-medium">Endereço</p>
+                          <p className="text-muted-foreground">Av. Paulista, 1000 - São Paulo, SP</p>
+                        </div>
                       </li>
                     </ul>
                   </div>
                   <div>
-                    <h3 className="text-lg font-medium">Horário de atendimento</h3>
-                    <p className="mt-2 text-sm text-muted-foreground">
+                    <h3 className="text-xl font-semibold mb-2">Horário de atendimento</h3>
+                    <p className="text-muted-foreground">
                       Segunda a Sexta: 9h às 18h<br />
                       Sábado: 9h às 13h
                     </p>
                   </div>
                 </div>
                 {/* Formulário de Contato */}
-                <div className="space-y-4">
+                <div className="space-y-4 bg-muted p-6 rounded-lg">
+                  <h3 className="text-xl font-semibold mb-4">Envie uma mensagem</h3>
                   <div className="grid gap-4">
                     <div className="grid gap-2">
-                      <label htmlFor="name" className="text-sm font-medium leading-none">
+                      <label htmlFor="name" className="text-sm font-medium">
                         Nome
                       </label>
                       <input
@@ -194,7 +228,7 @@ export default function Home() {
                       />
                     </div>
                     <div className="grid gap-2">
-                      <label htmlFor="email" className="text-sm font-medium leading-none">
+                      <label htmlFor="email" className="text-sm font-medium">
                         E-mail
                       </label>
                       <input
@@ -205,7 +239,7 @@ export default function Home() {
                       />
                     </div>
                     <div className="grid gap-2">
-                      <label htmlFor="message" className="text-sm font-medium leading-none">
+                      <label htmlFor="message" className="text-sm font-medium">
                         Mensagem
                       </label>
                       <textarea
@@ -214,9 +248,7 @@ export default function Home() {
                         placeholder="Como podemos ajudar?"
                       />
                     </div>
-                    <button className="inline-flex items-center justify-center rounded-md text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
-                      Enviar mensagem
-                    </button>
+                    <Button className="w-full">Enviar mensagem</Button>
                   </div>
                 </div>
               </div>
