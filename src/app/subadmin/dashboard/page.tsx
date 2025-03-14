@@ -1,11 +1,16 @@
 "use client"
 
 import type React from "react"
-
 import { useState, useEffect } from "react"
-import { useSearchParams } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/src/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/src/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs"
 import { SubadminLayout } from "@/src/components/layouts/subadmin-layout"
 import { DataTable } from "@/src/components/data-table"
@@ -20,7 +25,13 @@ import {
 } from "@/src/components/ui/dialog"
 import { Input } from "@/src/components/ui/input"
 import { Label } from "@/src/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/src/components/ui/select"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/src/components/ui/select"
 import { BarChart, FileText, Pencil, Stethoscope, Trash2, Users } from "lucide-react"
 import { getMedicos, createMedico, updateMedico, deleteMedico } from "@/src/lib/subadmin"
 import {
@@ -51,11 +62,11 @@ interface FaturamentoItem {
 }
 
 export default function SubadminDashboard() {
+  const router = useRouter()
+  // Inicializa activeTab com o valor do query param ou "medicos" por padrão.
   const searchParams = useSearchParams()
-  const tabParam = searchParams.get("tab")
-
-  // Define a tab ativa com base no parâmetro da URL ou usa "medicos" como padrão
-  const [activeTab, setActiveTab] = useState(tabParam || "medicos")
+  const initialTab = searchParams.get("tab") || "medicos"
+  const [activeTab, setActiveTab] = useState(initialTab)
 
   const [medicos, setMedicos] = useState<Medico[]>([])
   const [faturamento, setFaturamento] = useState<FaturamentoItem[]>([])
@@ -78,20 +89,13 @@ export default function SubadminDashboard() {
 
   useEffect(() => {
     loadData()
-
-    // Atualiza a tab ativa quando o parâmetro da URL muda
-    if (tabParam) {
-      setActiveTab(tabParam)
-    }
-  }, [tabParam])
+  }, [])
 
   const loadData = async () => {
     setIsLoading(true)
     try {
       const medicosData = await getMedicos()
       setMedicos(medicosData)
-
-      // Simulação de dados de faturamento
       setFaturamento([
         {
           id: "001",
@@ -174,15 +178,9 @@ export default function SubadminDashboard() {
     setDetailsDialogOpen(true)
   }
 
-  const handleCancelDelete = () => {
-    setDeleteDialogOpen(false)
-    setMedicoToDelete(null)
-  }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
-
     try {
       if (isEditing && currentMedico) {
         const updatedData = { ...formData }
@@ -195,7 +193,6 @@ export default function SubadminDashboard() {
       } else {
         await createMedico(formData)
       }
-
       await loadData()
       resetForm()
     } catch (error) {
@@ -221,7 +218,6 @@ export default function SubadminDashboard() {
 
   const confirmDelete = async () => {
     if (!medicoToDelete) return
-
     try {
       setIsLoading(true)
       await deleteMedico(medicoToDelete.id)
@@ -235,50 +231,35 @@ export default function SubadminDashboard() {
     }
   }
 
-  const columns = [
+  // Colunas para a tabela de Médicos
+  const medicoColumns = [
     {
       accessorKey: "nome",
       header: "Nome",
       cell: ({ row }: { row: { original: Medico } }) => (
-        <button
-          className="text-primary hover:underline text-left font-medium"
-          onClick={() => handleViewDetails(row.original)}
-        >
+        <button className="text-primary hover:underline text-left font-medium" onClick={() => handleViewDetails(row.original)}>
           {row.original.nome}
         </button>
       ),
     },
-    {
-      accessorKey: "email",
-      header: "E-mail",
-    },
+    { accessorKey: "email", header: "E-mail" },
     {
       accessorKey: "status",
       header: "Status",
-      cell: ({ row }: { row: { original: { status: string } } }) => (
-        <div
-          className={`px-2 py-1 rounded-full text-xs font-medium inline-block ${
-            row.original.status === "Ativo" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-          }`}
-        >
+      cell: ({ row }: { row: { original: Medico } }) => (
+        <div className={`px-2 py-1 rounded-full text-xs font-medium inline-block ${row.original.status === "Ativo" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
           {row.original.status}
         </div>
       ),
     },
     {
       id: "actions",
-      cell: ({ row }: { row: { original: any } }) => (
+      cell: ({ row }: { row: { original: Medico } }) => (
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="icon" onClick={() => handleEdit(row.original)} title="Editar">
             <Pencil className="h-4 w-4" />
           </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="text-destructive"
-            onClick={() => handleDelete(row.original)}
-            title="Remover"
-          >
+          <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDelete(row.original)} title="Remover">
             <Trash2 className="h-4 w-4" />
           </Button>
         </div>
@@ -286,23 +267,12 @@ export default function SubadminDashboard() {
     },
   ]
 
+  // Colunas para a tabela de Faturamento
   const faturamentoColumns = [
-    {
-      accessorKey: "id",
-      header: "Nº",
-    },
-    {
-      accessorKey: "data",
-      header: "Data",
-    },
-    {
-      accessorKey: "paciente",
-      header: "Paciente",
-    },
-    {
-      accessorKey: "medico",
-      header: "Médico",
-    },
+    { accessorKey: "id", header: "Nº" },
+    { accessorKey: "data", header: "Data" },
+    { accessorKey: "paciente", header: "Paciente" },
+    { accessorKey: "medico", header: "Médico" },
     {
       accessorKey: "valor",
       header: "Valor",
@@ -314,15 +284,13 @@ export default function SubadminDashboard() {
       accessorKey: "status",
       header: "Status",
       cell: ({ row }: { row: { original: FaturamentoItem } }) => (
-        <div
-          className={`px-2 py-1 rounded-full text-xs font-medium inline-block ${
-            row.original.status === "Pago"
-              ? "bg-green-100 text-green-800"
-              : row.original.status === "Pendente"
-                ? "bg-yellow-100 text-yellow-800"
-                : "bg-red-100 text-red-800"
-          }`}
-        >
+        <div className={`px-2 py-1 rounded-full text-xs font-medium inline-block ${
+          row.original.status === "Pago"
+            ? "bg-green-100 text-green-800"
+            : row.original.status === "Pendente"
+            ? "bg-yellow-100 text-yellow-800"
+            : "bg-red-100 text-red-800"
+        }`}>
           {row.original.status}
         </div>
       ),
@@ -342,12 +310,38 @@ export default function SubadminDashboard() {
     },
   ]
 
+  // Renderiza a tabela conforme a aba ativa
+  const renderDataTable = () => {
+    if (activeTab === "medicos") {
+      return (
+        <DataTable<Medico, unknown>
+          columns={medicoColumns}
+          data={medicos}
+          isLoading={isLoading}
+          searchColumn="nome"
+        />
+      )
+    } else if (activeTab === "faturamento") {
+      return (
+        <DataTable<FaturamentoItem, unknown>
+          columns={faturamentoColumns}
+          data={faturamento}
+          isLoading={isLoading}
+          searchColumn="paciente"
+        />
+      )
+    }
+    return null
+  }
+
   return (
     <SubadminLayout>
+      {/* Removido o header "Clinica Gestao" abaixo do navbar */}
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">Dashboard da Clínica</h1>
       </div>
 
+      {/* Cards de Indicadores */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -391,154 +385,159 @@ export default function SubadminDashboard() {
         </Card>
       </div>
 
+      {/* Abas de Navegação */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList>
           <TabsTrigger value="medicos">Médicos</TabsTrigger>
           <TabsTrigger value="faturamento">Faturamento</TabsTrigger>
           <TabsTrigger value="desempenho">Desempenho</TabsTrigger>
         </TabsList>
-        <TabsContent value="medicos" className="space-y-4">
-          <div className="flex justify-between items-center">
-            <h2 className="text-xl font-semibold">Gerenciar Médicos</h2>
-            <Dialog
-              open={openDialog}
-              onOpenChange={(open) => {
-                setOpenDialog(open)
-                if (!open) resetForm()
-              }}
-            >
-              <DialogTrigger asChild>
-                <Button
-                  onClick={() => {
-                    setIsEditing(false)
-                    resetForm()
+
+        {/* Conteúdo para Médicos e Faturamento */}
+        {activeTab !== "desempenho" && (
+          <TabsContent value={activeTab} className="space-y-4">
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-semibold">
+                {activeTab === "medicos" ? "Gerenciar Médicos" : "Faturamento e Notas Fiscais"}
+              </h2>
+              {activeTab === "medicos" ? (
+                <Dialog
+                  open={openDialog}
+                  onOpenChange={(open) => {
+                    setOpenDialog(open)
+                    if (!open) resetForm()
                   }}
                 >
-                  Adicionar Médico
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[425px]">
-                <form onSubmit={handleSubmit}>
-                  <DialogHeader>
-                    <DialogTitle>{isEditing ? "Editar Médico" : "Adicionar Médico"}</DialogTitle>
-                    <DialogDescription>
-                      {isEditing ? "Atualize os dados do médico" : "Preencha os dados para cadastrar um novo médico"}
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className="grid gap-4 py-4">
-                    <div className="grid gap-2">
-                      <Label htmlFor="nome">Nome completo</Label>
-                      <Input id="nome" name="nome" value={formData.nome} onChange={handleChange} required />
-                    </div>
-                    <div className="grid gap-2">
-                      <Label htmlFor="especialidade">Especialidade</Label>
-                      <Input
-                        id="especialidade"
-                        name="especialidade"
-                        value={formData.especialidade}
-                        onChange={handleChange}
-                        required
-                      />
-                    </div>
-                    <div className="grid gap-2">
-                      <Label htmlFor="crm">CRM</Label>
-                      <Input id="crm" name="crm" value={formData.crm} onChange={handleChange} required />
-                    </div>
-                    <div className="grid gap-2">
-                      <Label htmlFor="email">E-mail</Label>
-                      <Input
-                        id="email"
-                        name="email"
-                        type="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        required
-                      />
-                    </div>
-                    <div className="grid gap-2">
-                      <Label htmlFor="senha">
-                        {isEditing ? "Senha (deixe em branco para manter a atual)" : "Senha"}
-                      </Label>
-                      <Input
-                        id="senha"
-                        name="senha"
-                        type="password"
-                        value={formData.senha}
-                        onChange={handleChange}
-                        required={!isEditing}
-                      />
-                    </div>
-                    <div className="grid gap-2">
-                      <Label htmlFor="status">Status</Label>
-                      <Select value={formData.status} onValueChange={handleSelectChange}>
-                        <SelectTrigger id="status">
-                          <SelectValue placeholder="Selecione o status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Ativo">Ativo</SelectItem>
-                          <SelectItem value="Inativo">Inativo</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                  <DialogFooter>
-                    <Button type="submit" disabled={isLoading}>
-                      {isLoading ? "Salvando..." : "Salvar"}
+                  <DialogTrigger asChild>
+                    <Button
+                      onClick={() => {
+                        setIsEditing(false)
+                        resetForm()
+                      }}
+                    >
+                      Adicionar Médico
                     </Button>
-                  </DialogFooter>
-                </form>
-              </DialogContent>
-            </Dialog>
-          </div>
-          <Card>
-            <CardContent className="p-0">
-              <DataTable columns={columns} data={medicos} isLoading={isLoading} searchColumn="nome" />
-            </CardContent>
-          </Card>
-        </TabsContent>
-        <TabsContent value="faturamento" className="space-y-4">
-          <div className="flex justify-between items-center">
-            <h2 className="text-xl font-semibold">Faturamento e Notas Fiscais</h2>
-            <Button>Emitir Nova Nota Fiscal</Button>
-          </div>
-          <Card>
-            <CardContent className="p-0">
-              <DataTable
-                columns={faturamentoColumns}
-                data={faturamento}
-                isLoading={isLoading}
-                searchColumn="paciente"
-              />
-            </CardContent>
-          </Card>
-        </TabsContent>
-        <TabsContent value="desempenho" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Desempenho dos Médicos</CardTitle>
-              <CardDescription>Análise de produtividade e satisfação dos pacientes</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-8">
-                <div>
-                  <h3 className="text-lg font-medium mb-2">Consultas Realizadas por Médico</h3>
-                  <div className="h-[300px] w-full bg-muted rounded-md flex items-center justify-center">
-                    <p className="text-muted-foreground">Gráfico de barras com total de consultas por médico</p>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[425px]">
+                    <form onSubmit={handleSubmit}>
+                      <DialogHeader>
+                        <DialogTitle>{isEditing ? "Editar Médico" : "Adicionar Médico"}</DialogTitle>
+                        <DialogDescription>
+                          {isEditing
+                            ? "Atualize os dados do médico"
+                            : "Preencha os dados para cadastrar um novo médico"}
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="grid gap-4 py-4">
+                        <div className="grid gap-2">
+                          <Label htmlFor="nome">Nome completo</Label>
+                          <Input id="nome" name="nome" value={formData.nome} onChange={handleChange} required />
+                        </div>
+                        <div className="grid gap-2">
+                          <Label htmlFor="especialidade">Especialidade</Label>
+                          <Input id="especialidade" name="especialidade" value={formData.especialidade} onChange={handleChange} required />
+                        </div>
+                        <div className="grid gap-2">
+                          <Label htmlFor="crm">CRM</Label>
+                          <Input id="crm" name="crm" value={formData.crm} onChange={handleChange} required />
+                        </div>
+                        <div className="grid gap-2">
+                          <Label htmlFor="email">E-mail</Label>
+                          <Input id="email" name="email" type="email" value={formData.email} onChange={handleChange} required />
+                        </div>
+                        <div className="grid gap-2">
+                          <Label htmlFor="senha">{isEditing ? "Senha (deixe em branco para manter a atual)" : "Senha"}</Label>
+                          <Input id="senha" name="senha" type="password" value={formData.senha} onChange={handleChange} required={!isEditing} />
+                        </div>
+                        <div className="grid gap-2">
+                          <Label htmlFor="status">Status</Label>
+                          <Select value={formData.status} onValueChange={handleSelectChange}>
+                            <SelectTrigger id="status">
+                              <SelectValue placeholder="Selecione o status" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Ativo">Ativo</SelectItem>
+                              <SelectItem value="Inativo">Inativo</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                      <DialogFooter>
+                        <Button type="submit" disabled={isLoading}>
+                          {isLoading ? "Salvando..." : "Salvar"}
+                        </Button>
+                      </DialogFooter>
+                    </form>
+                  </DialogContent>
+                </Dialog>
+              ) : (
+                <Button>Emitir Nova Nota Fiscal</Button>
+              )}
+            </div>
+            <Card className="border-0">
+              <CardContent className="p-0">{renderDataTable()}</CardContent>
+            </Card>
+          </TabsContent>
+        )}
+
+        {activeTab === "desempenho" && (
+          <TabsContent value="desempenho" className="space-y-4">
+            <Card className="border-0">
+              <CardHeader>
+                <CardTitle>Desempenho da Clínica</CardTitle>
+                <CardDescription>Métricas e indicadores de performance</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm font-medium">Taxa de Ocupação</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">78%</div>
+                      <p className="text-xs text-muted-foreground">+5% em relação ao mês anterior</p>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm font-medium">Satisfação dos Pacientes</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">4.7/5</div>
+                      <p className="text-xs text-muted-foreground">Baseado em 234 avaliações</p>
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm font-medium">Tempo Médio de Espera</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">15min</div>
+                      <p className="text-xs text-muted-foreground">-2min em relação ao mês anterior</p>
+                    </CardContent>
+                  </Card>
+                </div>
+                <div className="mt-8 space-y-8">
+                  <div>
+                    <h3 className="text-lg font-medium mb-2">Consultas por Especialidade</h3>
+                    <div className="h-[300px] w-full bg-muted rounded-md flex items-center justify-center">
+                      <p className="text-muted-foreground">Gráfico de distribuição de consultas</p>
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-medium mb-2">Evolução do Faturamento</h3>
+                    <div className="h-[300px] w-full bg-muted rounded-md flex items-center justify-center">
+                      <p className="text-muted-foreground">Gráfico de evolução mensal</p>
+                    </div>
                   </div>
                 </div>
-                <div>
-                  <h3 className="text-lg font-medium mb-2">Avaliação dos Pacientes</h3>
-                  <div className="h-[300px] w-full bg-muted rounded-md flex items-center justify-center">
-                    <p className="text-muted-foreground">Gráfico de satisfação dos pacientes por médico</p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        )}
       </Tabs>
 
-      {/* Diálogo de confirmação de exclusão */}
+      {/* Diálogo para confirmação de exclusão */}
       {medicoToDelete && (
         <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
           <AlertDialogContent>
@@ -549,13 +548,17 @@ export default function SubadminDashboard() {
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <Button variant="outline" onClick={handleCancelDelete} className="mt-2 sm:mt-0">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setDeleteDialogOpen(false)
+                  setMedicoToDelete(null)
+                }}
+                className="mt-2 sm:mt-0"
+              >
                 Cancelar
               </Button>
-              <Button
-                onClick={confirmDelete}
-                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              >
+              <Button onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
                 Excluir
               </Button>
             </AlertDialogFooter>
@@ -590,11 +593,7 @@ export default function SubadminDashboard() {
               </div>
               <div className="grid grid-cols-[120px_1fr] items-center gap-2">
                 <span className="font-medium text-muted-foreground">Status:</span>
-                <div
-                  className={`px-2 py-1 rounded-full text-xs font-medium inline-block ${
-                    selectedMedico.status === "Ativo" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-                  }`}
-                >
+                <div className={`px-2 py-1 rounded-full text-xs font-medium inline-block ${selectedMedico.status === "Ativo" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
                   {selectedMedico.status}
                 </div>
               </div>
@@ -603,12 +602,7 @@ export default function SubadminDashboard() {
               <Button variant="outline" onClick={() => setDetailsDialogOpen(false)}>
                 Fechar
               </Button>
-              <Button
-                onClick={() => {
-                  setDetailsDialogOpen(false)
-                  handleEdit(selectedMedico)
-                }}
-              >
+              <Button onClick={() => { setDetailsDialogOpen(false); handleEdit(selectedMedico) }}>
                 Editar
               </Button>
             </DialogFooter>
@@ -618,4 +612,3 @@ export default function SubadminDashboard() {
     </SubadminLayout>
   )
 }
-

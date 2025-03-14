@@ -1,24 +1,31 @@
 "use client"
 
-import type React from "react"
-
-import { useState } from "react"
+import React, { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/src/components/ui/button"
 import { Input } from "@/src/components/ui/input"
 import { Label } from "@/src/components/ui/label"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/src/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/src/components/ui/card"
 import { Stethoscope } from "lucide-react"
 import { loginUser } from "@/src/lib/auth"
 
 export default function LoginPage() {
   const router = useRouter()
+  // Estados para e-mail, senha, loading e mensagem de erro
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
 
+  // Função que trata o envio do formulário
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
@@ -26,7 +33,7 @@ export default function LoginPage() {
 
     try {
       const user = await loginUser(email, password)
-
+      // Redireciona para a dashboard conforme o role do usuário
       if (user.role === "admin") {
         router.push("/admin/dashboard")
       } else if (user.role === "subadmin") {
@@ -44,16 +51,24 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-muted/40 p-4">
       <Card className="w-full max-w-md">
+        {/* Cabeçalho com logotipo e instruções */}
         <CardHeader className="space-y-1">
           <div className="flex items-center justify-center mb-2">
             <Stethoscope className="h-10 w-10 text-primary" />
           </div>
           <CardTitle className="text-2xl text-center">Entrar</CardTitle>
-          <CardDescription className="text-center">Entre com seu e-mail e senha para acessar o sistema</CardDescription>
+          <CardDescription className="text-center">
+            Entre com seu e-mail e senha para acessar o sistema
+          </CardDescription>
         </CardHeader>
+        {/* Formulário de login */}
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
-            {error && <div className="bg-destructive/15 text-destructive text-sm p-2 rounded-md">{error}</div>}
+            {error && (
+              <div className="bg-destructive/15 text-destructive text-sm p-2 rounded-md">
+                {error}
+              </div>
+            )}
             <div className="space-y-2">
               <Label htmlFor="email">E-mail</Label>
               <Input
@@ -81,6 +96,7 @@ export default function LoginPage() {
               />
             </div>
           </CardContent>
+          {/* Rodapé com botão de envio e link para cadastro */}
           <CardFooter className="flex flex-col space-y-6 pt-4">
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? "Entrando..." : "Entrar"}
@@ -97,4 +113,3 @@ export default function LoginPage() {
     </div>
   )
 }
-

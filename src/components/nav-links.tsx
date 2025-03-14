@@ -1,17 +1,14 @@
 "use client"
 
-import type React from "react"
-
+import React from "react"
 import Link from "next/link"
 
+// Componente de links de navegação com rolagem suave para seções
 export function NavLinks() {
-  // Função para rolagem suave
+  // Função que impede a navegação padrão e realiza a rolagem suave para o elemento com o id fornecido
   const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
     e.preventDefault()
-    const element = document.getElementById(id)
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" })
-    }
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" })
   }
 
   return (
@@ -23,7 +20,10 @@ export function NavLinks() {
       >
         Sobre
       </Link>
-      <Link href="/precos" className="transition-colors hover:text-foreground/80 text-foreground/60">
+      <Link
+        href="/precos"
+        className="transition-colors hover:text-foreground/80 text-foreground/60"
+      >
         Preços
       </Link>
       <Link
@@ -36,4 +36,3 @@ export function NavLinks() {
     </nav>
   )
 }
-

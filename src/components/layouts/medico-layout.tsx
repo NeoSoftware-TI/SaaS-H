@@ -1,38 +1,27 @@
 "use client"
 
-import type React from "react"
-
-import { useState } from "react"
-import Link from "next/link"
+import React, { useState } from "react"
 import { usePathname, useRouter } from "next/navigation"
+import Link from "next/link"
 import { Button } from "@/src/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/src/components/ui/avatar"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/src/components/ui/dropdown-menu"
-import { Sheet, SheetContent, SheetTrigger } from "@/src/components/ui/sheet"
 import {
-  Bell,
-  Calendar,
-  ChevronDown,
-  ClipboardList,
-  LogOut,
-  Menu,
-  Settings,
-  Stethoscope,
-  User,
-  Users,
-} from "lucide-react"
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/src/components/ui/dropdown-menu"
+import { Sheet, SheetContent, SheetTrigger } from "@/src/components/ui/sheet"
+// Importando todos os ícones necessários, incluindo Calendar
+import { Bell, Calendar, LogOut, Menu, Settings, Stethoscope, User, Users, ChevronDown } from "lucide-react"
 import { cn } from "@/src/lib/utils"
 
-interface MedicoLayoutProps {
-  children: React.ReactNode
-}
-
-export function MedicoLayout({ children }: MedicoLayoutProps) {
+export function MedicoLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
-  // Remover a entrada de configurações do array de rotas
+  // Rotas do menu com verificação de rota ativa
   const routes = [
     {
       href: "/medico/dashboard",
@@ -55,18 +44,19 @@ export function MedicoLayout({ children }: MedicoLayoutProps) {
     {
       href: "/medico/prontuarios",
       label: "Prontuários",
-      icon: ClipboardList,
+      icon: User,
       active: pathname === "/medico/prontuarios",
     },
   ]
 
-  const handleNavigate = (path: string) => {
-    router.push(path)
-  }
+  // Função de navegação
+  const handleNavigate = (path: string) => router.push(path)
 
   return (
     <div className="flex min-h-screen flex-col">
+      {/* Navbar */}
       <header className="sticky top-0 z-50 flex h-16 items-center gap-4 border-b bg-white shadow-sm px-4 md:px-6">
+        {/* Menu Mobile */}
         <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
           <SheetTrigger asChild>
             <Button variant="outline" size="icon" className="md:hidden">
@@ -91,7 +81,7 @@ export function MedicoLayout({ children }: MedicoLayoutProps) {
                   href={route.href}
                   className={cn(
                     "flex items-center gap-2 px-2 py-1 rounded-md",
-                    route.active ? "text-primary bg-muted" : "text-muted-foreground",
+                    route.active ? "text-primary bg-muted" : "text-muted-foreground"
                   )}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
@@ -102,10 +92,14 @@ export function MedicoLayout({ children }: MedicoLayoutProps) {
             </nav>
           </SheetContent>
         </Sheet>
+
+        {/* Logo para Desktop */}
         <Link href="/" className="flex items-center gap-2 md:ml-0">
           <Stethoscope className="h-6 w-6" />
           <span className="font-bold hidden md:inline-block">ClinicaGestão</span>
         </Link>
+
+        {/* Menu Desktop */}
         <div className="flex-1">
           <nav className="hidden md:flex gap-6 ml-6">
             {routes.map((route) => (
@@ -114,7 +108,7 @@ export function MedicoLayout({ children }: MedicoLayoutProps) {
                 href={route.href}
                 className={cn(
                   "flex items-center gap-2 text-sm font-medium",
-                  route.active ? "text-primary" : "text-muted-foreground hover:text-primary",
+                  route.active ? "text-primary" : "text-muted-foreground hover:text-primary"
                 )}
               >
                 {route.label}
@@ -122,6 +116,8 @@ export function MedicoLayout({ children }: MedicoLayoutProps) {
             ))}
           </nav>
         </div>
+
+        {/* Ações de perfil e notificações */}
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="icon">
             <Bell className="h-5 w-5" />
@@ -156,16 +152,11 @@ export function MedicoLayout({ children }: MedicoLayoutProps) {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Link href="/medico/configuracoes">
-            <Button variant="ghost" size="icon" title="Configurações">
-              <Settings className="h-5 w-5" />
-              <span className="sr-only">Configurações</span>
-            </Button>
-          </Link>
         </div>
       </header>
+
+      {/* Conteúdo da página */}
       <main className="flex-1 p-4 md:p-6">{children}</main>
     </div>
   )
 }
-

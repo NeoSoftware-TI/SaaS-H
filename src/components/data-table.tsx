@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import React, { useState } from "react"
 import {
   type ColumnDef,
   flexRender,
@@ -30,9 +30,11 @@ export function DataTable<TData, TValue>({
   isLoading = false,
   searchColumn,
 }: DataTableProps<TData, TValue>) {
+  // Estados para ordenação e filtragem de colunas
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 
+  // Configura o React Table com funções de ordenação, filtro e paginação
   const table = useReactTable({
     data,
     columns,
@@ -42,36 +44,35 @@ export function DataTable<TData, TValue>({
     getSortedRowModel: getSortedRowModel(),
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
-    state: {
-      sorting,
-      columnFilters,
-    },
+    state: { sorting, columnFilters },
   })
 
   return (
     <div className="space-y-4">
+      {/* Input para filtrar dados se searchColumn estiver definido */}
       {searchColumn && (
         <div className="flex items-center py-4 px-4">
           <Input
             placeholder="Filtrar..."
             value={(table.getColumn(searchColumn)?.getFilterValue() as string) ?? ""}
-            onChange={(event) => table.getColumn(searchColumn)?.setFilterValue(event.target.value)}
+            onChange={(e) => table.getColumn(searchColumn)?.setFilterValue(e.target.value)}
             className="max-w-sm"
           />
         </div>
       )}
+      {/* Tabela */}
       <div className="rounded-md border">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
+                {headerGroup.headers.map((header) =>
+                  header.isPlaceholder ? null : (
                     <TableHead key={header.id}>
-                      {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                      {flexRender(header.column.columnDef.header, header.getContext())}
                     </TableHead>
                   )
-                })}
+                )}
               </TableRow>
             ))}
           </TableHeader>
@@ -103,6 +104,7 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
+      {/* Paginação */}
       <div className="flex items-center justify-end px-4">
         <div className="flex-1 text-sm text-muted-foreground">
           {table.getFilteredRowModel().rows.length} registro(s) no total.
@@ -117,7 +119,12 @@ export function DataTable<TData, TValue>({
             <ChevronLeft className="h-4 w-4 mr-1" />
             Anterior
           </Button>
-          <Button variant="outline" size="sm" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+          >
             Próximo
             <ChevronRight className="h-4 w-4 ml-1" />
           </Button>
@@ -126,4 +133,3 @@ export function DataTable<TData, TValue>({
     </div>
   )
 }
-

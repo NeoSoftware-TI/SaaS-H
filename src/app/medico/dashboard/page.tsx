@@ -1,11 +1,15 @@
 "use client"
 
-import type React from "react"
-
-import { useState, useEffect } from "react"
+import React, { useState, useEffect } from "react"
 import { useSearchParams } from "next/navigation"
 import { Button } from "@/src/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/src/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs"
 import { MedicoLayout } from "@/src/components/layouts/medico-layout"
 import { DataTable } from "@/src/components/data-table"
@@ -21,10 +25,25 @@ import {
 import { Input } from "@/src/components/ui/input"
 import { Label } from "@/src/components/ui/label"
 import { Textarea } from "@/src/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/src/components/ui/select"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/src/components/ui/select"
 import { Calendar } from "@/src/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/src/components/ui/popover"
-import { CalendarIcon, ClipboardList, Clock, Pencil, Trash2, Users } from "lucide-react"
+import {
+  ClipboardList,
+  Clock,
+  Pencil,
+  Trash2,
+  Users,
+  BarChart,
+  FileText,
+  Calendar as CalendarIcon,
+} from "lucide-react"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
 import {
@@ -44,7 +63,7 @@ import {
   AlertDialogTitle,
 } from "@/src/components/ui/alert-dialog"
 
-// Definindo interfaces para os tipos
+// Interfaces dos dados usados na dashboard
 interface Consulta {
   id: string
   pacienteId: string
@@ -67,18 +86,17 @@ interface Paciente {
 }
 
 export default function MedicoDashboard() {
+  // Inicializa a aba ativa com o query param ou "agenda" por padrão
   const searchParams = useSearchParams()
   const tabParam = searchParams.get("tab")
-
-  // Define a tab ativa com base no parâmetro da URL ou usa "agenda" como padrão
   const [activeTab, setActiveTab] = useState(tabParam || "agenda")
 
+  // Estados para consultas, pacientes, loading e diálogos
   const [consultas, setConsultas] = useState<Consulta[]>([])
   const [pacientes, setPacientes] = useState<Paciente[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [openConsultaDialog, setOpenConsultaDialog] = useState(false)
   const [openPacienteDialog, setOpenPacienteDialog] = useState(false)
-  const [date, setDate] = useState<Date | undefined>(new Date())
   const [isEditing, setIsEditing] = useState(false)
   const [currentPaciente, setCurrentPaciente] = useState<Paciente | null>(null)
   const [pacienteToDelete, setPacienteToDelete] = useState<Paciente | null>(null)
@@ -86,6 +104,7 @@ export default function MedicoDashboard() {
   const [selectedPaciente, setSelectedPaciente] = useState<Paciente | null>(null)
   const [detailsDialogOpen, setDetailsDialogOpen] = useState(false)
 
+  // Estados dos formulários para consulta e paciente
   const [consultaForm, setConsultaForm] = useState({
     pacienteId: "",
     data: new Date(),
@@ -93,7 +112,6 @@ export default function MedicoDashboard() {
     tipo: "Consulta",
     observacoes: "",
   })
-
   const [pacienteForm, setPacienteForm] = useState({
     nome: "",
     cpf: "",
@@ -103,13 +121,10 @@ export default function MedicoDashboard() {
     endereco: "",
   })
 
+  // Carrega os dados de consultas e pacientes e atualiza a aba ativa se houver query param
   useEffect(() => {
     loadData()
-
-    // Atualiza a tab ativa quando o parâmetro da URL muda
-    if (tabParam) {
-      setActiveTab(tabParam)
-    }
+    if (tabParam) setActiveTab(tabParam)
   }, [tabParam])
 
   const loadData = async () => {
@@ -117,7 +132,6 @@ export default function MedicoDashboard() {
     try {
       const consultasData = await getConsultas()
       const pacientesData = await getPacientes()
-
       setConsultas(consultasData)
       setPacientes(pacientesData)
     } catch (error) {
@@ -127,30 +141,25 @@ export default function MedicoDashboard() {
     }
   }
 
+  // Handlers para atualizar os formulários
   const handleConsultaChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setConsultaForm((prev) => ({ ...prev, [name]: value }))
   }
-
   const handlePacienteChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setPacienteForm((prev) => ({ ...prev, [name]: value }))
   }
-
   const handleSelectChange = (name: string, value: string) => {
-    if (name === "pacienteId") {
-      setConsultaForm((prev) => ({ ...prev, pacienteId: value }))
-    } else if (name === "tipo") {
-      setConsultaForm((prev) => ({ ...prev, tipo: value }))
+    if (name === "pacienteId" || name === "tipo") {
+      setConsultaForm((prev) => ({ ...prev, [name]: value }))
     }
   }
-
   const handleDateSelect = (date: Date | undefined) => {
-    if (date) {
-      setConsultaForm((prev) => ({ ...prev, data: date }))
-    }
+    if (date) setConsultaForm((prev) => ({ ...prev, data: date }))
   }
 
+  // Handlers para editar, excluir e visualizar pacientes
   const handleEditPaciente = (paciente: Paciente) => {
     setCurrentPaciente(paciente)
     setPacienteForm({
@@ -164,29 +173,24 @@ export default function MedicoDashboard() {
     setIsEditing(true)
     setOpenPacienteDialog(true)
   }
-
   const handleDeletePaciente = (paciente: Paciente) => {
     setPacienteToDelete(paciente)
     setDeleteDialogOpen(true)
   }
-
   const handleViewDetails = (paciente: Paciente) => {
     setSelectedPaciente(paciente)
     setDetailsDialogOpen(true)
   }
-
   const handleCancelDelete = () => {
     setDeleteDialogOpen(false)
     setPacienteToDelete(null)
   }
-
   const confirmDeletePaciente = async () => {
     if (!pacienteToDelete) return
-
     setIsLoading(true)
     try {
       await deletePaciente(pacienteToDelete.id)
-      await loadData() // Recarrega a lista após excluir
+      await loadData()
     } catch (error) {
       console.error("Erro ao excluir paciente:", error)
     } finally {
@@ -196,38 +200,25 @@ export default function MedicoDashboard() {
     }
   }
 
+  // Reseta os formulários
   const resetPacienteForm = () => {
-    setPacienteForm({
-      nome: "",
-      cpf: "",
-      dataNascimento: "",
-      telefone: "",
-      email: "",
-      endereco: "",
-    })
+    setPacienteForm({ nome: "", cpf: "", dataNascimento: "", telefone: "", email: "", endereco: "" })
     setIsEditing(false)
     setCurrentPaciente(null)
     setOpenPacienteDialog(false)
   }
-
   const resetConsultaForm = () => {
-    setConsultaForm({
-      pacienteId: "",
-      data: new Date(),
-      hora: "",
-      tipo: "Consulta",
-      observacoes: "",
-    })
+    setConsultaForm({ pacienteId: "", data: new Date(), hora: "", tipo: "Consulta", observacoes: "" })
     setOpenConsultaDialog(false)
   }
 
+  // Handlers de submissão dos formulários
   const handleConsultaSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
-
     try {
       await createConsulta(consultaForm)
-      await loadData() // Recarrega a lista após criar
+      await loadData()
       resetConsultaForm()
     } catch (error) {
       console.error("Erro ao criar consulta:", error)
@@ -235,21 +226,16 @@ export default function MedicoDashboard() {
       setIsLoading(false)
     }
   }
-
   const handlePacienteSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
-
     try {
       if (isEditing && currentPaciente) {
-        // Atualiza paciente existente
         await updatePaciente(currentPaciente.id, pacienteForm)
       } else {
-        // Cria novo paciente
         await createPaciente(pacienteForm)
       }
-
-      await loadData() // Recarrega a lista após criar/atualizar
+      await loadData()
       resetPacienteForm()
     } catch (error) {
       console.error("Erro ao salvar paciente:", error)
@@ -258,37 +244,23 @@ export default function MedicoDashboard() {
     }
   }
 
-  // Colunas para a tabela de consultas
+  // Definição das colunas da tabela de consultas
   const consultasColumns = [
-    {
-      accessorKey: "data",
-      header: "Data",
-    },
-    {
-      accessorKey: "hora",
-      header: "Hora",
-    },
-    {
-      accessorKey: "paciente",
-      header: "Paciente",
-    },
-    {
-      accessorKey: "tipo",
-      header: "Tipo",
-    },
+    { accessorKey: "data", header: "Data" },
+    { accessorKey: "hora", header: "Hora" },
+    { accessorKey: "paciente", header: "Paciente" },
+    { accessorKey: "tipo", header: "Tipo" },
     {
       accessorKey: "status",
       header: "Status",
       cell: ({ row }: { row: { original: { status: string } } }) => (
-        <div
-          className={`px-2 py-1 rounded-full text-xs font-medium inline-block ${
-            row.original.status === "Confirmada"
-              ? "bg-green-100 text-green-800"
-              : row.original.status === "Pendente"
-                ? "bg-yellow-100 text-yellow-800"
-                : "bg-red-100 text-red-800"
-          }`}
-        >
+        <div className={`px-2 py-1 rounded-full text-xs font-medium inline-block ${
+          row.original.status === "Confirmada"
+            ? "bg-green-100 text-green-800"
+            : row.original.status === "Pendente"
+            ? "bg-yellow-100 text-yellow-800"
+            : "bg-red-100 text-red-800"
+        }`}>
           {row.original.status}
         </div>
       ),
@@ -308,36 +280,21 @@ export default function MedicoDashboard() {
     },
   ]
 
-  // Colunas para a tabela de pacientes
+  // Definição das colunas da tabela de pacientes
   const pacientesColumns = [
     {
       accessorKey: "nome",
       header: "Nome",
       cell: ({ row }: { row: { original: Paciente } }) => (
-        <button
-          className="text-primary hover:underline text-left font-medium"
-          onClick={() => handleViewDetails(row.original)}
-        >
+        <button className="text-primary hover:underline text-left font-medium" onClick={() => handleViewDetails(row.original)}>
           {row.original.nome}
         </button>
       ),
     },
-    {
-      accessorKey: "cpf",
-      header: "CPF",
-    },
-    {
-      accessorKey: "telefone",
-      header: "Telefone",
-    },
-    {
-      accessorKey: "email",
-      header: "E-mail",
-    },
-    {
-      accessorKey: "ultimaConsulta",
-      header: "Última Consulta",
-    },
+    { accessorKey: "cpf", header: "CPF" },
+    { accessorKey: "telefone", header: "Telefone" },
+    { accessorKey: "email", header: "E-mail" },
+    { accessorKey: "ultimaConsulta", header: "Última Consulta" },
     {
       id: "actions",
       cell: ({ row }: { row: { original: Paciente } }) => (
@@ -345,13 +302,7 @@ export default function MedicoDashboard() {
           <Button variant="ghost" size="icon" onClick={() => handleEditPaciente(row.original)} title="Editar">
             <Pencil className="h-4 w-4" />
           </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="text-destructive"
-            onClick={() => handleDeletePaciente(row.original)}
-            title="Remover"
-          >
+          <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDeletePaciente(row.original)} title="Remover">
             <Trash2 className="h-4 w-4" />
           </Button>
         </div>
@@ -361,10 +312,12 @@ export default function MedicoDashboard() {
 
   return (
     <MedicoLayout>
+      {/* Cabeçalho da Dashboard */}
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">Dashboard Médico</h1>
       </div>
 
+      {/* Cards de indicadores */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mb-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -398,12 +351,15 @@ export default function MedicoDashboard() {
         </Card>
       </div>
 
+      {/* Abas de navegação */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList>
           <TabsTrigger value="agenda">Agenda</TabsTrigger>
           <TabsTrigger value="pacientes">Pacientes</TabsTrigger>
           <TabsTrigger value="prontuarios">Prontuários</TabsTrigger>
         </TabsList>
+        
+        {/* Aba "Agenda" com formulário de agendamento e tabela de consultas */}
         <TabsContent value="agenda" className="space-y-4">
           <div className="flex justify-between items-center">
             <h2 className="text-xl font-semibold">Agenda de Consultas</h2>
@@ -424,12 +380,10 @@ export default function MedicoDashboard() {
                     <DialogDescription>Preencha os dados para agendar uma nova consulta</DialogDescription>
                   </DialogHeader>
                   <div className="grid gap-4 py-4">
+                    {/* Seleção do paciente */}
                     <div className="grid gap-2">
                       <Label htmlFor="paciente">Paciente</Label>
-                      <Select
-                        value={consultaForm.pacienteId}
-                        onValueChange={(value) => handleSelectChange("pacienteId", value)}
-                      >
+                      <Select value={consultaForm.pacienteId} onValueChange={(value) => handleSelectChange("pacienteId", value)}>
                         <SelectTrigger id="paciente">
                           <SelectValue placeholder="Selecione o paciente" />
                         </SelectTrigger>
@@ -442,39 +396,24 @@ export default function MedicoDashboard() {
                         </SelectContent>
                       </Select>
                     </div>
+                    {/* Seleção da data via popover com calendário */}
                     <div className="grid gap-2">
                       <Label>Data</Label>
                       <Popover>
                         <PopoverTrigger asChild>
                           <Button variant="outline" className="w-full justify-start text-left font-normal">
                             <CalendarIcon className="mr-2 h-4 w-4" />
-                            {consultaForm.data ? (
-                              format(consultaForm.data, "PPP", { locale: ptBR })
-                            ) : (
-                              <span>Selecione uma data</span>
-                            )}
+                            {consultaForm.data ? format(consultaForm.data, "PPP", { locale: ptBR }) : <span>Selecione uma data</span>}
                           </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0">
-                          <Calendar
-                            mode="single"
-                            selected={consultaForm.data as Date}
-                            onSelect={handleDateSelect}
-                            initialFocus
-                          />
+                          <Calendar mode="single" selected={consultaForm.data as Date} onSelect={handleDateSelect} initialFocus />
                         </PopoverContent>
                       </Popover>
                     </div>
                     <div className="grid gap-2">
                       <Label htmlFor="hora">Horário</Label>
-                      <Input
-                        id="hora"
-                        name="hora"
-                        type="time"
-                        value={consultaForm.hora}
-                        onChange={handleConsultaChange}
-                        required
-                      />
+                      <Input id="hora" name="hora" type="time" value={consultaForm.hora} onChange={handleConsultaChange} required />
                     </div>
                     <div className="grid gap-2">
                       <Label htmlFor="tipo">Tipo de Consulta</Label>
@@ -491,30 +430,25 @@ export default function MedicoDashboard() {
                     </div>
                     <div className="grid gap-2">
                       <Label htmlFor="observacoes">Observações</Label>
-                      <Textarea
-                        id="observacoes"
-                        name="observacoes"
-                        value={consultaForm.observacoes}
-                        onChange={handleConsultaChange}
-                        rows={3}
-                      />
+                      <Textarea id="observacoes" name="observacoes" value={consultaForm.observacoes} onChange={handleConsultaChange} rows={3} />
                     </div>
                   </div>
                   <DialogFooter>
-                    <Button type="submit" disabled={isLoading}>
-                      {isLoading ? "Agendando..." : "Agendar"}
-                    </Button>
+                    <Button type="submit" disabled={isLoading}>{isLoading ? "Agendando..." : "Agendar"}</Button>
                   </DialogFooter>
                 </form>
               </DialogContent>
             </Dialog>
           </div>
-          <Card>
+          {/* Tabela de Consultas */}
+          <Card className="border-0">
             <CardContent className="p-0">
               <DataTable columns={consultasColumns} data={consultas} isLoading={isLoading} searchColumn="paciente" />
             </CardContent>
           </Card>
         </TabsContent>
+        
+        {/* Aba "Pacientes" com formulário de cadastro e tabela de pacientes */}
         <TabsContent value="pacientes" className="space-y-4">
           <div className="flex justify-between items-center">
             <h2 className="text-xl font-semibold">Pacientes</h2>
@@ -526,23 +460,14 @@ export default function MedicoDashboard() {
               }}
             >
               <DialogTrigger asChild>
-                <Button
-                  onClick={() => {
-                    setIsEditing(false)
-                    resetPacienteForm()
-                  }}
-                >
-                  Cadastrar Paciente
-                </Button>
+                <Button onClick={() => { setIsEditing(false); resetPacienteForm() }}>Cadastrar Paciente</Button>
               </DialogTrigger>
               <DialogContent className="sm:max-w-[425px]">
                 <form onSubmit={handlePacienteSubmit}>
                   <DialogHeader>
                     <DialogTitle>{isEditing ? "Editar Paciente" : "Cadastrar Novo Paciente"}</DialogTitle>
                     <DialogDescription>
-                      {isEditing
-                        ? "Atualize os dados do paciente"
-                        : "Preencha os dados para cadastrar um novo paciente"}
+                      {isEditing ? "Atualize os dados do paciente" : "Preencha os dados para cadastrar um novo paciente"}
                     </DialogDescription>
                   </DialogHeader>
                   <div className="grid gap-4 py-4">
@@ -556,61 +481,37 @@ export default function MedicoDashboard() {
                     </div>
                     <div className="grid gap-2">
                       <Label htmlFor="dataNascimento">Data de Nascimento</Label>
-                      <Input
-                        id="dataNascimento"
-                        name="dataNascimento"
-                        type="date"
-                        value={pacienteForm.dataNascimento}
-                        onChange={handlePacienteChange}
-                        required
-                      />
+                      <Input id="dataNascimento" name="dataNascimento" type="date" value={pacienteForm.dataNascimento} onChange={handlePacienteChange} required />
                     </div>
                     <div className="grid gap-2">
                       <Label htmlFor="telefone">Telefone</Label>
-                      <Input
-                        id="telefone"
-                        name="telefone"
-                        value={pacienteForm.telefone}
-                        onChange={handlePacienteChange}
-                        required
-                      />
+                      <Input id="telefone" name="telefone" value={pacienteForm.telefone} onChange={handlePacienteChange} required />
                     </div>
                     <div className="grid gap-2">
                       <Label htmlFor="email">E-mail</Label>
-                      <Input
-                        id="email"
-                        name="email"
-                        type="email"
-                        value={pacienteForm.email}
-                        onChange={handlePacienteChange}
-                      />
+                      <Input id="email" name="email" type="email" value={pacienteForm.email} onChange={handlePacienteChange} />
                     </div>
                     <div className="grid gap-2">
                       <Label htmlFor="endereco">Endereço</Label>
-                      <Textarea
-                        id="endereco"
-                        name="endereco"
-                        value={pacienteForm.endereco}
-                        onChange={handlePacienteChange}
-                        rows={2}
-                      />
+                      <Textarea id="endereco" name="endereco" value={pacienteForm.endereco} onChange={handlePacienteChange} rows={2} />
                     </div>
                   </div>
                   <DialogFooter>
-                    <Button type="submit" disabled={isLoading}>
-                      {isLoading ? "Salvando..." : "Salvar"}
-                    </Button>
+                    <Button type="submit" disabled={isLoading}>{isLoading ? "Salvando..." : "Salvar"}</Button>
                   </DialogFooter>
                 </form>
               </DialogContent>
             </Dialog>
           </div>
-          <Card>
+          {/* Tabela de Pacientes */}
+          <Card className="border-0">
             <CardContent className="p-0">
               <DataTable columns={pacientesColumns} data={pacientes} isLoading={isLoading} searchColumn="nome" />
             </CardContent>
           </Card>
         </TabsContent>
+        
+        {/* Aba "Prontuários" com área para busca e exibição de prontuários */}
         <TabsContent value="prontuarios" className="space-y-4">
           <Card>
             <CardHeader>
@@ -634,7 +535,7 @@ export default function MedicoDashboard() {
         </TabsContent>
       </Tabs>
 
-      {/* Diálogo de confirmação de exclusão */}
+      {/* Diálogo para exclusão de paciente */}
       {pacienteToDelete && (
         <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
           <AlertDialogContent>
@@ -648,10 +549,7 @@ export default function MedicoDashboard() {
               <Button variant="outline" onClick={handleCancelDelete} className="mt-2 sm:mt-0">
                 Cancelar
               </Button>
-              <Button
-                onClick={confirmDeletePaciente}
-                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              >
+              <Button onClick={confirmDeletePaciente} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
                 Excluir
               </Button>
             </AlertDialogFooter>
@@ -698,17 +596,8 @@ export default function MedicoDashboard() {
               </div>
             </div>
             <DialogFooter>
-              <Button variant="outline" onClick={() => setDetailsDialogOpen(false)}>
-                Fechar
-              </Button>
-              <Button
-                onClick={() => {
-                  setDetailsDialogOpen(false)
-                  handleEditPaciente(selectedPaciente)
-                }}
-              >
-                Editar
-              </Button>
+              <Button variant="outline" onClick={() => setDetailsDialogOpen(false)}>Fechar</Button>
+              <Button onClick={() => { setDetailsDialogOpen(false); handleEditPaciente(selectedPaciente) }}>Editar</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -716,4 +605,3 @@ export default function MedicoDashboard() {
     </MedicoLayout>
   )
 }
-

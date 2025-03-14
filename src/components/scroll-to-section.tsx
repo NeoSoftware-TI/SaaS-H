@@ -7,18 +7,21 @@ import { ArrowRight, Building2, Mail, MapPin, Phone, Stethoscope, Users } from "
 import ScrollToSection from "@/src/components/scroll-to-section"
 
 export default function Home() {
+  // Função para rolagem suave até uma seção específica
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id)
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" })
-    }
+    if (element) element.scrollIntoView({ behavior: "smooth" })
   }
 
   return (
     <div className="flex min-h-screen flex-col">
+      {/* Componente para rolagem (pode conter lógica para scroll observável) */}
       <ScrollToSection />
+
+      {/* Navbar */}
       <header className="sticky top-0 z-50 w-full border-b bg-white shadow-sm">
         <div className="container flex h-14 items-center">
+          {/* Logo e links de navegação (visível em desktop) */}
           <div className="mr-4 hidden md:flex">
             <Link href="/" className="mr-6 flex items-center space-x-2">
               <Stethoscope className="h-6 w-6" />
@@ -42,6 +45,8 @@ export default function Home() {
               </button>
             </nav>
           </div>
+
+          {/* Botões de acesso */}
           <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
             <div className="w-full flex-1 md:w-auto md:flex-none">
               <Button asChild variant="outline" className="ml-auto hidden md:flex">
@@ -54,7 +59,10 @@ export default function Home() {
           </div>
         </div>
       </header>
+
+      {/* Conteúdo Principal */}
       <main className="flex-1">
+        {/* Seção Hero */}
         <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48">
           <div className="container px-4 md:px-6">
             <div className="grid gap-6 lg:grid-cols-[1fr_400px] lg:gap-12 xl:grid-cols-[1fr_600px]">
@@ -80,6 +88,7 @@ export default function Home() {
                   </Button>
                 </div>
               </div>
+              {/* Imagem ilustrativa */}
               <img
                 src="/placeholder.svg?height=550&width=800"
                 alt="Dashboard da plataforma"
@@ -90,6 +99,8 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        {/* Seção de Funcionalidades */}
         <section id="features" className="w-full py-12 md:py-24 lg:py-32 bg-muted">
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
@@ -152,6 +163,8 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        {/* Seção de Contato */}
         <section id="contato" className="w-full py-12 md:py-24 lg:py-32 bg-white border-t">
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
@@ -164,6 +177,7 @@ export default function Home() {
             </div>
             <div className="mx-auto max-w-3xl mt-12">
               <div className="grid gap-8 md:grid-cols-2">
+                {/* Informações de Contato */}
                 <div className="space-y-6">
                   <div>
                     <h3 className="text-xl font-semibold mb-4">Informações de contato</h3>
@@ -194,12 +208,12 @@ export default function Home() {
                   <div>
                     <h3 className="text-xl font-semibold mb-2">Horário de atendimento</h3>
                     <p className="text-muted-foreground">
-                      Segunda a Sexta: 9h às 18h
-                      <br />
+                      Segunda a Sexta: 9h às 18h<br />
                       Sábado: 9h às 13h
                     </p>
                   </div>
                 </div>
+                {/* Formulário de Contato */}
                 <div className="space-y-4 bg-muted p-6 rounded-lg">
                   <h3 className="text-xl font-semibold mb-4">Envie uma mensagem</h3>
                   <div className="grid gap-4">
@@ -209,7 +223,7 @@ export default function Home() {
                       </label>
                       <input
                         id="name"
-                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                         placeholder="Seu nome"
                       />
                     </div>
@@ -220,7 +234,7 @@ export default function Home() {
                       <input
                         id="email"
                         type="email"
-                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                         placeholder="seu@email.com"
                       />
                     </div>
@@ -230,7 +244,7 @@ export default function Home() {
                       </label>
                       <textarea
                         id="message"
-                        className="flex min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                        className="flex min-h-[120px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                         placeholder="Como podemos ajudar?"
                       />
                     </div>
@@ -242,15 +256,17 @@ export default function Home() {
           </div>
         </section>
       </main>
+
+      {/* Footer */}
       <footer className="flex flex-col gap-2 sm:flex-row py-6 w-full shrink-0 items-center px-4 md:px-6 border-t">
         <p className="text-xs text-muted-foreground">
           &copy; {new Date().getFullYear()} ClinicaGestão. Todos os direitos reservados.
         </p>
         <nav className="sm:ml-auto flex gap-4 sm:gap-6">
-          <Link className="text-xs hover:underline underline-offset-4" href="#">
+          <Link className="text-xs hover:underline" href="#">
             Termos de Serviço
           </Link>
-          <Link className="text-xs hover:underline underline-offset-4" href="#">
+          <Link className="text-xs hover:underline" href="#">
             Privacidade
           </Link>
         </nav>
@@ -258,4 +274,3 @@ export default function Home() {
     </div>
   )
 }
-
