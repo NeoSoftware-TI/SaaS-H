@@ -12,28 +12,17 @@ import {
   DropdownMenuTrigger,
 } from "@/src/components/ui/dropdown-menu"
 import { Sheet, SheetContent, SheetTrigger } from "@/src/components/ui/sheet"
-import {
-  Building2,
-  FileText,
-  LogOut,
-  Menu,
-  Settings,
-  User,
-  Users,
-  Bell,
-  ChevronDown,
-} from "lucide-react"
+import { Building2, FileText, LogOut, Menu, Settings, Stethoscope, User, Users, Bell, ChevronDown } from "lucide-react"
 import { cn } from "@/src/lib/utils"
 
-// Layout utilizado nas páginas de administração
 export function AdminLayout({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname()
   const router = useRouter()
+  const pathname = usePathname()
   const searchParams = useSearchParams()
-  // Estado para controle do menu mobile
+  const currentTab = searchParams.get("tab") || "subadmins"
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
-  // Rotas do menu com ícones e condição "active" baseada no pathname e query param "tab"
+  // Rotas do menu com verificação de rota ativa
   const routes = [
     {
       href: "/admin/dashboard?tab=subadmins",
@@ -55,14 +44,14 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
     },
   ]
 
-  // Função para navegação programática
+  // Navegação programática
   const handleNavigate = (path: string) => router.push(path)
 
   return (
     <div className="flex min-h-screen flex-col">
       {/* Navbar */}
       <header className="sticky top-0 z-50 flex h-16 items-center gap-4 border-b bg-white shadow-sm px-4 md:px-6">
-        {/* Menu Mobile (Sheet) */}
+        {/* Menu Mobile (Sheet) com fundo branco */}
         <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
           <SheetTrigger asChild>
             <Button variant="outline" size="icon" className="md:hidden">
@@ -70,7 +59,8 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
               <span className="sr-only">Toggle Menu</span>
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="w-72">
+          {/* Adicionamos "bg-white" para garantir o fundo branco no menu mobile */}
+          <SheetContent side="left" className="w-72 bg-white">
             <nav className="grid gap-2 text-lg font-medium">
               <Link
                 href="/"
@@ -98,12 +88,14 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
             </nav>
           </SheetContent>
         </Sheet>
+
         {/* Logo para Desktop */}
         <Link href="/" className="flex items-center gap-2 md:ml-0">
           <Building2 className="h-6 w-6" />
           <span className="font-bold hidden md:inline-block">ClinicaGestão</span>
         </Link>
-        {/* Menu de navegação para Desktop */}
+
+        {/* Menu Desktop */}
         <div className="flex-1">
           <nav className="hidden md:flex gap-6 ml-6">
             {routes.map((route) => (
@@ -120,7 +112,8 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
             ))}
           </nav>
         </div>
-        {/* Ações do perfil */}
+
+        {/* Ações de Perfil e Notificações */}
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="icon">
             <Bell className="h-5 w-5" />
@@ -163,6 +156,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
           </Link>
         </div>
       </header>
+
       {/* Conteúdo da página */}
       <main className="flex-1 p-4 md:p-6">{children}</main>
     </div>

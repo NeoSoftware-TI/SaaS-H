@@ -12,17 +12,18 @@ import {
   DropdownMenuTrigger,
 } from "@/src/components/ui/dropdown-menu"
 import { Sheet, SheetContent, SheetTrigger } from "@/src/components/ui/sheet"
+// Inclua os ícones Bell e ChevronDown junto com os demais
 import {
-  BarChart,
-  Bell,
   Building2,
-  ChevronDown,
   FileText,
   LogOut,
   Menu,
   Settings,
   Stethoscope,
   User,
+  Bell,
+  ChevronDown,
+  BarChart,
 } from "lucide-react"
 import { cn } from "@/src/lib/utils"
 
@@ -70,7 +71,7 @@ export function SubadminLayout({ children }: SubadminLayoutProps) {
     <div className="flex min-h-screen flex-col">
       {/* Navbar */}
       <header className="sticky top-0 z-50 flex h-16 items-center gap-4 border-b bg-white shadow-sm px-4 md:px-6">
-        {/* Menu Mobile com Sheet */}
+        {/* Menu Mobile com Sheet e fundo branco */}
         <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
           <SheetTrigger asChild>
             <Button variant="outline" size="icon" className="md:hidden">
@@ -78,7 +79,7 @@ export function SubadminLayout({ children }: SubadminLayoutProps) {
               <span className="sr-only">Toggle Menu</span>
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="w-72">
+          <SheetContent side="left" className="w-72 bg-white">
             <nav className="grid gap-2 text-lg font-medium">
               {/* Logo no menu mobile */}
               <Link
@@ -90,7 +91,6 @@ export function SubadminLayout({ children }: SubadminLayoutProps) {
                 <span className="font-bold">ClinicaGestão</span>
               </Link>
               <div className="my-4 h-px bg-muted" />
-              {/* Renderização das rotas do menu */}
               {routes.map((route) => (
                 <Link
                   key={route.href}
@@ -177,7 +177,7 @@ export function SubadminLayout({ children }: SubadminLayoutProps) {
         </div>
       </header>
 
-      {/* Conteúdo Principal */}
+      {/* Conteúdo da Página */}
       <main className="flex-1 p-4 md:p-6">{children}</main>
     </div>
   )
