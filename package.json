@@ -12,26 +12,46 @@
     "@headlessui/react": "^2.2.0",
     "@heroicons/react": "^2.2.0",
     "@tailwindcss/forms": "^0.5.10",
+    "axios": "^1.8.3",
     "chart.js": "^4.4.8",
     "date-fns": "^4.1.0",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
     "lucide-react": "^0.475.0",
+    "mysql": "^2.18.1",
+    "mysql2": "^3.13.0",
     "next": "15.1.6",
     "react": "^19.0.0",
     "react-calendar": "^5.1.0",
     "react-chartjs-2": "^5.3.0",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.54.2",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "ts-node-dev": "^2.0.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
-    "@types/node": "^20",
+    "@types/express": "^5.0.0",
+    "@types/node": "^20.17.24",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.1.6",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5"
-  }
+    "typescript": "^5.8.2"
+  },
+  "description": "This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NeoSoftware-TI/SaaS-H.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/NeoSoftware-TI/SaaS-H/issues"
+  },
+  "homepage": "https://github.com/NeoSoftware-TI/SaaS-H#readme"
 }
