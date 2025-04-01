@@ -28,7 +28,9 @@ CREATE TABLE IF NOT EXISTS usuario (
     -- Campo usado para a especialidade do médico; poderá ser nulo para outros tipos de usuários
     especialidade VARCHAR(255),
     permissao_id INTEGER NOT NULL,
+    clinica_id INTEGER,
     FOREIGN KEY (permissao_id) REFERENCES permissao(id) ON DELETE CASCADE
+    FOREIGN KEY (clinica_id) REFERENCES clinica(id) ON DELETE SET NULL
 );
 
 -- ----------------------------------------------------------------------
@@ -61,3 +63,16 @@ CREATE TABLE IF NOT EXISTS prontuario (
     FOREIGN KEY (paciente_id) REFERENCES usuario(id) ON DELETE CASCADE,
     FOREIGN KEY (medico_id) REFERENCES usuario(id) ON DELETE CASCADE
 );
+-- Tabela de CLÍNICAS (opcional – caso a aplicação deseje associar um sub-admin e/ou médico à unidade)
+CREATE TABLE clinica (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(255) NOT NULL,  -- Ex.: 'Clínica Serenity', 'Clínica InnovateHealth', etc.
+    subadmin_id INT DEFAULT NULL, -- Referência ao usuário com permissão 'Sub-Admin'
+    medico_id INT DEFAULT NULL,   -- Referência ao usuário com permissão 'Medico'
+    FOREIGN KEY (subadmin_id) REFERENCES usuario(id) ON DELETE CASCADE,
+    FOREIGN KEY (medico_id) REFERENCES usuario(id) ON DELETE CASCADE
+);
+
+-- NOTA:
+-- Nenhum usuário (Admin, Sub-Admin, Médico, Cliente) é criado via SQL.
+-- As operações de INSERT, UPDATE e DELETE para os registros devem ser realizadas pela aplicação.
